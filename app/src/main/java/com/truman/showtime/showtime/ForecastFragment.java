@@ -20,6 +20,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,9 +29,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,8 +45,8 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 ;
 
@@ -53,7 +54,8 @@ import java.util.List;
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
  */
 public class ForecastFragment extends Fragment {
-    ArrayAdapter<String> mForecastAdapter;
+    WeatherAdapter mWeatherAdapter;
+    ArrayList<String> mWeekForecast;
 
     public ForecastFragment() {
     }
@@ -97,33 +99,59 @@ public class ForecastFragment extends Fragment {
                 "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
                 "Sun 6/29 - Sunny - 20/7"
         };
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
-
-        // Now that we have some dummy forecast data, create an ArrayAdapter.
-        // The ArrayAdapter will take data from a source (like our dummy forecast) and
-        // use it to populate the ListView it's attached to.
-        mForecastAdapter =
-                new ArrayAdapter<String>(
-                        getActivity(), // The current context (this activity)
-                        R.layout.list_item_layout, // The name of the layout ID.
-                        R.id.list_item_forecast_textview, // The ID of the textview to populate.
-                        weekForecast);
-
+        mWeekForecast = new ArrayList<String>(Arrays.asList(data));
+        mWeatherAdapter = new WeatherAdapter();
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
-        listView.setAdapter(mForecastAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
-                detailIntent.putExtra(Intent.EXTRA_TEXT, mForecastAdapter.getItem(i));
-                startActivity(detailIntent);
-            }
-        });
+        RecyclerView listView = (RecyclerView) rootView.findViewById(R.id.listview_forecast);
+        listView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        listView.setAdapter(mWeatherAdapter);
 
         return rootView;
+    }
+
+    private class WeatherHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private String mWeather;
+
+        public WeatherHolder(View itemView) {
+            super(itemView);
+            itemView.setOnClickListener(this);
+        }
+
+        public void bindWeather(String weather) {
+           mWeather = weather;
+           TextView textView = (TextView) itemView.findViewById(R.id.list_item_forecast_textview);
+           textView.setText(mWeather);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
+            detailIntent.putExtra(Intent.EXTRA_TEXT, mWeather);
+            startActivity(detailIntent);
+        }
+    }
+
+    private class WeatherAdapter
+            extends RecyclerView.Adapter<WeatherHolder> {
+        @Override
+        public WeatherHolder onCreateViewHolder(ViewGroup parent, int pos) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.list_item_layout, parent, false);
+            return new WeatherHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(WeatherHolder holder, int pos) {
+            String crime = mWeekForecast.get(pos);
+            holder.bindWeather(crime);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mWeekForecast.size();
+        }
     }
 
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
@@ -282,7 +310,7 @@ public class ForecastFragment extends Fragment {
                 return getWeatherDataFromJson(forecastJsonStr, 7);
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
+                // If the code didn't successfully get the weather data, there's no point in attempting
                 // to parse it.
                 return null;
             } catch (JSONException e) {
@@ -304,8 +332,9 @@ public class ForecastFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String[] strings) {
-            mForecastAdapter.clear();
-            mForecastAdapter.addAll(strings);
+            mWeekForecast.clear();
+            Collections.addAll(mWeekForecast, strings);
+            mWeatherAdapter.notifyDataSetChanged();
         }
     }
 }
