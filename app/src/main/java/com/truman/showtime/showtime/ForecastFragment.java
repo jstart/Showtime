@@ -32,11 +32,16 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -75,10 +80,16 @@ public class ForecastFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
-            FetchWeatherTask task = new FetchWeatherTask();
-            task.execute("94043");
+//            FetchWeatherTask task = new FetchWeatherTask();
+//            task.execute("94043");
+            FandangoApiManager api = new FandangoApiManager();
+
+            String zipCode = "90504";
+            String parameters = String.format("op=theatersbypostalcodesearch&postalcode=%s", zipCode);
+
+            api.execute(parameters);
             return true;
-        }else if (item.getItemId() == R.id.action_settings){
+        } else if (item.getItemId() == R.id.action_settings) {
             Intent settingsIntent = new Intent(getActivity(), SettingsActivity.class);
             startActivity(settingsIntent);
         }
@@ -120,9 +131,9 @@ public class ForecastFragment extends Fragment {
         }
 
         public void bindWeather(String weather) {
-           mWeather = weather;
-           TextView textView = (TextView) itemView.findViewById(R.id.list_item_forecast_textview);
-           textView.setText(mWeather);
+            mWeather = weather;
+            TextView textView = (TextView) itemView.findViewById(R.id.list_item_forecast_textview);
+            textView.setText(mWeather);
         }
 
         @Override
@@ -161,7 +172,7 @@ public class ForecastFragment extends Fragment {
         /* The date/time conversion code is going to be moved outside the asynctask later,
  * so for convenience we're breaking it out into its own method now.
  */
-        private String getReadableDateString(long time){
+        private String getReadableDateString(long time) {
             // Because the API returns a unix timestamp (measured in seconds),
             // it must be converted to milliseconds in order to be converted to valid date.
             Date date = new Date(time * 1000);
@@ -184,7 +195,7 @@ public class ForecastFragment extends Fragment {
         /**
          * Take the String representing the complete forecast in JSON Format and
          * pull out the data we need to construct the Strings needed for the wireframes.
-         *
+         * <p/>
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
@@ -204,7 +215,7 @@ public class ForecastFragment extends Fragment {
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
             String[] resultStrs = new String[numDays];
-            for(int i = 0; i < weatherArray.length(); i++) {
+            for (int i = 0; i < weatherArray.length(); i++) {
                 // For now, using the format "Day, description, hi/low"
                 String day;
                 String description;
@@ -335,6 +346,44 @@ public class ForecastFragment extends Fragment {
             mWeekForecast.clear();
             Collections.addAll(mWeekForecast, strings);
             mWeatherAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public class FandangoApiManager extends AsyncTask<String, Integer, String> {
+
+        protected String getResponse(String parameters) {
+
+            String result = null;
+
+            try {
+
+                String requestUri = "http://data.tmsapi.com/v1/movies/showings?startDate=2015-01-15&zip=90504&api_key=hyphjf9jfew223xkgsh5gbk8";
+
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpResponse response = httpclient.execute(new HttpGet(requestUri));
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                response.getEntity().writeTo(out);
+                out.close();
+                result = out.toString();
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+            }
+
+            return result;
+        }
+
+        @Override
+        protected String doInBackground(String... arg0) {
+            return getResponse(arg0[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            mWeekForecast.clear();
+//            Collections.addAll(mWeekForecast, strings);
+//            mWeatherAdapter.notifyDataSetChanged();
         }
     }
 }
