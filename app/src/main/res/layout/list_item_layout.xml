@@ -6,7 +6,8 @@
     android:id="@+id/list_item_layout"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:background="?android:selectableItemBackground">
 
     <TextView
         android:layout_width="fill_parent"
