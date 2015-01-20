@@ -17,11 +17,15 @@ package com.truman.showtime.showtime;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +33,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -39,17 +47,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
-public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     TheaterAdapter mTheaterAdapter;
     ArrayList<String> mTheaterResults;
     SwipeRefreshLayout mRefreshLayout;
+    GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
 
     public TheaterFragment() {
     }
@@ -78,39 +86,93 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        // Create some dummy data for the ListView.  Here's a sample weekly forecast
-        String[] data = {
-                "Mon 6/23 - Sunny - 31/17",
-                "Tue 6/24 - Foggy - 21/8",
-                "Wed 6/25 - Cloudy - 22/17",
-                "Thurs 6/26 - Rainy - 18/11",
-                "Fri 6/27 - Foggy - 21/10",
-                "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
-                "Sun 6/29 - Sunny - 20/7"
-        };
-
-        mTheaterResults = new ArrayList<String>(Arrays.asList(data));
+        mTheaterResults = new ArrayList<String>();
         mTheaterAdapter = new TheaterAdapter();
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
         mRefreshLayout.setOnRefreshListener(this);
 
-        // Get a reference to the ListView, and attach this adapter to it.
         RecyclerView listView = (RecyclerView) rootView.findViewById(R.id.listview_theaters);
         listView.setLayoutManager(new LinearLayoutManager(getActivity()));
         listView.setAdapter(mTheaterAdapter);
 
+//        File cacheDir = getActivity().getCacheDir();
+//        File file = new File(cacheDir, "90504");
+//        int length = (int) file.length();
+//
+//        byte[] bytes = new byte[length];
+//
+//        FileInputStream in = null;
+//        try {
+//            in = new FileInputStream(file);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            in.read(bytes);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                in.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        String contents = new String(bytes);
         ShowtimeApiManager api = new ShowtimeApiManager();
+//        api.parseAndReloadResults(contents);
+
         api.execute("");
+        buildGoogleApiClient();
+        mGoogleApiClient.connect();
+
         return rootView;
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity().getApplicationContext())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            ShowtimeApiManager api = new ShowtimeApiManager();
+            String lat = String.valueOf(mLastLocation.getLatitude());
+            String lon = String.valueOf(mLastLocation.getLongitude());
+            Geocoder geocoder = new Geocoder(getActivity().getApplicationContext(), Locale.getDefault());
+            List<Address> addresses = null;
+            try {
+                addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+                api.execute(lat, lon, "");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
     }
 
     @Override
     public void onRefresh() {
         ShowtimeApiManager api = new ShowtimeApiManager();
         api.execute("");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
     }
 
     private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -156,10 +218,10 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
         }
     }
 
-    public class ShowtimeApiManager extends AsyncTask<String, Integer, String> {
+    public class ShowtimeApiManager extends AsyncTask<String, String, String> {
 
         protected String getResponse(String parameters) {
-
+            Log.d("", parameters);
             String result = null;
 
             try {
@@ -187,22 +249,26 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
         @Override
         protected void onPostExecute(String result) {
             mTheaterResults.clear();
+            parseAndReloadResults(result);
+        }
+
+        public void parseAndReloadResults(String result){
             try {
                 JSONArray jsonArray = new JSONArray(result);
 
-                File cacheDir = getActivity().getCacheDir();
-                File f = new File(cacheDir, "90504");
-
-                try {
-                    FileOutputStream out = new FileOutputStream(
-                            f);
-                    out.write(result.getBytes());
-                    out.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                File cacheDir = getActivity().getCacheDir();
+//                File f = new File(cacheDir, "90504");
+//
+//                try {
+//                    FileOutputStream out = new FileOutputStream(
+//                            f);
+//                    out.write(result.getBytes());
+//                    out.close();
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
 
                 for (int i = 0; i < jsonArray.length(); i++){
                     JSONObject object = jsonArray.getJSONObject(i);

@@ -31,6 +31,7 @@ dependencies {
         transitive = true
     }
     compile 'com.android.support:recyclerview-v7:+'
-    compile 'com.android.support:appcompat-v7:+'
-    compile 'com.android.support:support-v4:21'
+    compile 'com.android.support:appcompat-v7:21.0.+'
+    compile 'com.android.support:support-v4:21.+'
+    compile 'com.google.android.gms:play-services:6.5.+'
 }
