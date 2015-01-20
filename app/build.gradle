@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'crashlytics'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 21
@@ -27,6 +27,10 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.crashlytics.android:crashlytics:1.+'
+    compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
+        transitive = true
+    }
     compile 'com.android.support:recyclerview-v7:+'
+    compile 'com.android.support:appcompat-v7:+'
+    compile 'com.android.support:support-v4:21'
 }
