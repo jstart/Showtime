@@ -129,7 +129,7 @@ public class MovieFragment extends Fragment {
             public void bindMovie(JSONObject movieObject) {
                 mMovie = movieObject;
                 TextView titleTextView = (TextView) itemView.findViewById(R.id.list_item_theater_textview);
-                TextView addressTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
+                TextView showtimeTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
 
                 try {
                     titleTextView.setText(mMovie.getString("name"));
@@ -138,8 +138,15 @@ public class MovieFragment extends Fragment {
                 }
                 try {
                     JSONArray showtimes = mMovie.getJSONArray("showtimes");
-
-                    addressTextView.setText(showtimes.toString());
+                    String showtimesList = "";
+                    for (int i = 0; i < showtimes.length(); i++) {
+                        String row = showtimes.optString(i);
+                        showtimesList += (row);
+                        if (i < showtimes.length() - 1){
+                            showtimesList += ", ";
+                        }
+                    }
+                    showtimeTextView.setText(showtimesList);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
