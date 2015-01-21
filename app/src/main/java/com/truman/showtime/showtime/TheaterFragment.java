@@ -58,6 +58,8 @@ import java.util.Locale;
 public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     TheaterAdapter mTheaterAdapter;
     ArrayList<ArrayList<String>> mTheaterResults;
+    ArrayList<JSONObject> mTheaterDetailsResults;
+
     SwipeRefreshLayout mRefreshLayout;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
@@ -116,6 +118,7 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mTheaterResults = new ArrayList<ArrayList<String>>();
+        mTheaterDetailsResults = new ArrayList<JSONObject>();
         mTheaterAdapter = new TheaterAdapter();
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -226,7 +229,8 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
         @Override
         public void onClick(View v) {
             Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
-            detailIntent.putExtra(Intent.EXTRA_TEXT, mTheater);
+            int index = mTheaterResults.indexOf(mTheater);
+            detailIntent.putExtra("TheaterDetails", mTheaterDetailsResults.get(index).toString());
             startActivity(detailIntent);
         }
     }
@@ -306,9 +310,11 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                 for (int i = 0; i < jsonArray.length(); i++){
                     JSONObject object = jsonArray.getJSONObject(i);
+                    mTheaterDetailsResults.add(object);
                     ArrayList<String> fields = new ArrayList<>();
                     fields.add(object.getString("name"));
                     fields.add(object.getString("address"));
+
                     mTheaterResults.add(fields);
                 }
                 mTheaterAdapter.notifyDataSetChanged();
