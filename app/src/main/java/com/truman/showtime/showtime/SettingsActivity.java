@@ -5,7 +5,8 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
- 
+import android.support.v7.app.ActionBarActivity;
+
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
  * <p>
@@ -14,7 +15,7 @@ import android.preference.PreferenceManager;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends PreferenceActivity
+public class SettingsActivity extends ActionBarActivity
         implements Preference.OnPreferenceChangeListener {
  
     @Override

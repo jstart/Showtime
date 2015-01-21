@@ -16,7 +16,10 @@
 package com.truman.showtime.showtime;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -54,7 +57,7 @@ import java.util.Locale;
 
 public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     TheaterAdapter mTheaterAdapter;
-    ArrayList<String> mTheaterResults;
+    ArrayList<ArrayList<String>> mTheaterResults;
     SwipeRefreshLayout mRefreshLayout;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
@@ -82,11 +85,37 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
         }
         return false;
     }
+    public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
+        private Drawable mDivider;
+
+        public SimpleDividerItemDecoration(Context context) {
+            mDivider = context.getResources().getDrawable(R.drawable.line_divider);
+        }
+
+        @Override
+        public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+            int left = parent.getPaddingLeft();
+            int right = parent.getWidth() - parent.getPaddingRight();
+
+            int childCount = parent.getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                View child = parent.getChildAt(i);
+
+                RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
+
+                int top = child.getBottom() + params.bottomMargin;
+                int bottom = top + mDivider.getIntrinsicHeight();
+
+                mDivider.setBounds(left, top, right, bottom);
+                mDivider.draw(c);
+            }
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mTheaterResults = new ArrayList<String>();
+        mTheaterResults = new ArrayList<ArrayList<String>>();
         mTheaterAdapter = new TheaterAdapter();
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -94,6 +123,7 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
         mRefreshLayout.setOnRefreshListener(this);
 
         RecyclerView listView = (RecyclerView) rootView.findViewById(R.id.listview_theaters);
+        listView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
         listView.setLayoutManager(new LinearLayoutManager(getActivity()));
         listView.setAdapter(mTheaterAdapter);
 
@@ -176,17 +206,20 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private String mTheater;
+        private ArrayList<String> mTheater;
 
         public TheaterHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
         }
 
-        public void bindTheater(String theater) {
-            mTheater = theater;
-            TextView textView = (TextView) itemView.findViewById(R.id.list_item_theater_textview);
-            textView.setText(mTheater);
+        public void bindTheater(ArrayList<String> theaterFields) {
+            mTheater = theaterFields;
+            TextView titleTextView = (TextView) itemView.findViewById(R.id.list_item_theater_textview);
+            TextView addressTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
+
+            titleTextView.setText(mTheater.get(0));
+            addressTextView.setText(mTheater.get(1));
         }
 
         @Override
@@ -208,7 +241,7 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         @Override
         public void onBindViewHolder(TheaterHolder holder, int pos) {
-            String crime = mTheaterResults.get(pos);
+            ArrayList<String> crime = mTheaterResults.get(pos);
             holder.bindTheater(crime);
         }
 
@@ -272,7 +305,10 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
                 for (int i = 0; i < jsonArray.length(); i++){
                     JSONObject object = jsonArray.getJSONObject(i);
-                    mTheaterResults.add(object.getString("name"));
+                    ArrayList<String> fields = new ArrayList<>();
+                    fields.add(object.getString("name"));
+                    fields.add(object.getString("address"));
+                    mTheaterResults.add(fields);
                 }
                 mTheaterAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
