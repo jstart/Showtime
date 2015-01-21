@@ -28,7 +28,6 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,6 +50,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -187,7 +187,7 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-                api.execute(lat, lon, "");
+                api.execute(lat, lon, URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8"), "0");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -258,12 +258,11 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     public class ShowtimeApiManager extends AsyncTask<String, String, String> {
 
-        protected String getResponse(String lat, String lon, String city) {
-            Log.d("", lat + lon);
+        protected String getResponse(String lat, String lon, String city, String date) {
             String result = null;
 
             try {
-                String requestUri = String.format("https://showtime-server.herokuapp.com/showtimes?lat=%s&lon=%s&date=0", lat, lon);
+                String requestUri = String.format("https://showtime-server.herokuapp.com/showtimes?lat=%s&lon=%s&date=%s&city=%s", lat, lon, date, city);
 
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpResponse response = httpclient.execute(new HttpGet(requestUri));
@@ -281,7 +280,7 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         @Override
         protected String doInBackground(String... arg0) {
-            return getResponse(arg0[0], arg0[1], arg0[2]);
+            return getResponse(arg0[0], arg0[1], arg0[2], arg0[3]);
         }
 
         @Override
