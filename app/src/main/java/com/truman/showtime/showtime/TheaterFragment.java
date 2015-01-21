@@ -152,10 +152,8 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
 //        }
 //
 //        String contents = new String(bytes);
-        ShowtimeApiManager api = new ShowtimeApiManager();
 //        api.parseAndReloadResults(contents);
 
-        api.execute("");
         buildGoogleApiClient();
         mGoogleApiClient.connect();
 
@@ -172,6 +170,10 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onConnected(Bundle connectionHint) {
+        refreshWithLocation();
+    }
+
+    public void refreshWithLocation() {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
@@ -196,8 +198,7 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onRefresh() {
-        ShowtimeApiManager api = new ShowtimeApiManager();
-        api.execute("");
+        refreshWithLocation();
     }
 
     @Override
@@ -253,12 +254,12 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     public class ShowtimeApiManager extends AsyncTask<String, String, String> {
 
-        protected String getResponse(String parameters) {
-            Log.d("", parameters);
+        protected String getResponse(String lat, String lon, String city) {
+            Log.d("", lat + lon);
             String result = null;
 
             try {
-                String requestUri = "https://showtime-server.herokuapp.com/showtimes?lat=33.8358&lon=-118.3406&date=0&zipcode=90504";
+                String requestUri = String.format("https://showtime-server.herokuapp.com/showtimes?lat=%s&lon=%s&date=0", lat, lon);
 
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpResponse response = httpclient.execute(new HttpGet(requestUri));
@@ -276,7 +277,7 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         @Override
         protected String doInBackground(String... arg0) {
-            return getResponse(arg0[0]);
+            return getResponse(arg0[0], arg0[1], arg0[2]);
         }
 
         @Override
