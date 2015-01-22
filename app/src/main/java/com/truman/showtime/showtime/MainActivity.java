@@ -62,14 +62,13 @@ public class MainActivity extends ActionBarActivity {
             }
         };
 
-        // Add 3 tabs, specifying the tab's text and TabListener
         for (int i = 0; i < 2; i++) {
             String title = "";
             switch (i) {
-                case 0:
+                case 1:
                     title = "Playing Nearby";
                     break;
-                case 1:
+                case 0:
                     title = "Theaters";
                     break;
             }
@@ -89,9 +88,13 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public Fragment getItem(int i) {
-            TheaterFragment fragment = new TheaterFragment();
-            Bundle args = new Bundle();
-            // Our object is just an integer :-P
+            Fragment fragment;
+            if (i == 1){
+                fragment = new MovieListFragment();
+            }else {
+                fragment = new TheaterFragment();
+
+            }
             return fragment;
         }
 

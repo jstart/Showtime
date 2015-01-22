@@ -85,7 +85,23 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+            mMovieAdapter = new MovieAdapter();
+
+            View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+            mLayoutManager = new LinearLayoutManager(getActivity());
+            RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview_movies);
+
+            mRecyclerView.setNestedScrollingEnabled(true);
+            mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
+            mRecyclerView.setLayoutManager(mLayoutManager);
+            mRecyclerView.setAdapter(mMovieAdapter);
+
             String jsonString = getActivity().getIntent().getStringExtra("TheaterDetails");
+
+            if (jsonString == null){
+                mMovieResults = new ArrayList<JSONObject>();
+                return rootView;
+            }
             JSONObject theater;
 
             try {
@@ -106,17 +122,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            mMovieAdapter = new MovieAdapter();
-
-            View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-            mLayoutManager = new LinearLayoutManager(getActivity());
-            RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview_movies);
-
-            mRecyclerView.setNestedScrollingEnabled(true);
-            mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
-            mRecyclerView.setLayoutManager(mLayoutManager);
-            mRecyclerView.setAdapter(mMovieAdapter);
 
             return rootView;
         }
