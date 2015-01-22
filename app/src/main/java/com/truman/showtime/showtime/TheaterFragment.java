@@ -15,7 +15,6 @@
  */
 package com.truman.showtime.showtime;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -25,7 +24,10 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -55,12 +57,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class TheaterFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     TheaterAdapter mTheaterAdapter;
     ArrayList<ArrayList<String>> mTheaterResults;
     ArrayList<JSONObject> mTheaterDetailsResults;
 
     SwipeRefreshLayout mRefreshLayout;
+    RecyclerView mRecyclerView;
+    LinearLayoutManager mLayoutManager;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
 
@@ -125,10 +129,11 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
         mRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
         mRefreshLayout.setOnRefreshListener(this);
 
-        RecyclerView listView = (RecyclerView) rootView.findViewById(R.id.listview_theaters);
-        listView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
-        listView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        listView.setAdapter(mTheaterAdapter);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview_theaters);
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mTheaterAdapter);
 
 //        File cacheDir = getActivity().getCacheDir();
 //        File file = new File(cacheDir, "90504");
@@ -161,6 +166,13 @@ public class TheaterFragment extends Fragment implements SwipeRefreshLayout.OnRe
         mGoogleApiClient.connect();
 
         return rootView;
+    }
+
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mRecyclerView.setNestedScrollingEnabled(true);
+        final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
+
     }
 
     protected synchronized void buildGoogleApiClient() {

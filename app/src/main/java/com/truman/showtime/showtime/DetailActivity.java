@@ -10,8 +10,8 @@ public class DetailActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new MovieFragment())
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, new MovieListFragment())
                     .commit();
         }
     }

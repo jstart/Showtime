@@ -1,6 +1,5 @@
 package com.truman.showtime.showtime;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -26,13 +25,14 @@ import java.util.ArrayList;
 /**
  * Created by ctruman on 1/21/15.
  */
-public class MovieFragment extends Fragment {
+public class MovieListFragment extends android.support.v4.app.Fragment {
         MovieAdapter mMovieAdapter;
         ArrayList<JSONObject> mMovieResults;
-
+        RecyclerView mRecyclerView;
+        LinearLayoutManager mLayoutManager;
         SwipeRefreshLayout mRefreshLayout;
 
-        public MovieFragment() {
+        public MovieListFragment() {
         }
 
         @Override
@@ -90,7 +90,7 @@ public class MovieFragment extends Fragment {
 
             try {
                 theater = new JSONObject(jsonString);
-
+                getActivity().setTitle(theater.optString("name"));
                 ArrayList<JSONObject> listdata = new ArrayList<JSONObject>();
                 JSONArray jArray = theater.getJSONArray("movies");
                 if (jArray != null) {
@@ -110,15 +110,18 @@ public class MovieFragment extends Fragment {
             mMovieAdapter = new MovieAdapter();
 
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+            mLayoutManager = new LinearLayoutManager(getActivity());
+            RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview_movies);
 
-            RecyclerView listView = (RecyclerView) rootView.findViewById(R.id.listview_movies);
-            listView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
-            listView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            listView.setAdapter(mMovieAdapter);
+            mRecyclerView.setNestedScrollingEnabled(true);
+            mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
+            mRecyclerView.setLayoutManager(mLayoutManager);
+            mRecyclerView.setAdapter(mMovieAdapter);
+
             return rootView;
         }
 
-        private class MovieHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private class MovieHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             private JSONObject mMovie;
 
             public MovieHolder(View itemView) {

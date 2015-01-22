@@ -4,7 +4,6 @@
     android:layout_height="fill_parent"
     android:paddingLeft="0dp"
     android:paddingRight="0dp"
-    android:paddingTop="0dp"
     android:paddingBottom="0dp"
     android:id="@+id/refresh_layout"
     tools:context=".MainActivity$PlaceholderFragment">
