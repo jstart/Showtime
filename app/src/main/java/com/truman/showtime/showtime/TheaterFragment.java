@@ -30,13 +30,17 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import org.apache.http.HttpResponse;
@@ -54,7 +58,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class TheaterFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class TheaterFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     TheaterAdapter mTheaterAdapter;
     ArrayList<ArrayList<String>> mTheaterResults;
     ArrayList<JSONObject> mTheaterDetailsResults;
@@ -63,9 +67,15 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
     RecyclerView mRecyclerView;
     LinearLayoutManager mLayoutManager;
     GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
+    private Location mLastLocation;
+    private LocationRequest mLocationRequest;
 
     public TheaterFragment() {
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        refreshWithLocation();
     }
 
     public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
@@ -141,6 +151,10 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
 
         buildGoogleApiClient();
         mGoogleApiClient.connect();
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_NO_POWER)
+                .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
+                .setFastestInterval(100 * 1000); // 100 second, in milliseconds
 
         return rootView;
     }
@@ -154,6 +168,23 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
                 mRefreshLayout.setRefreshing(true);
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!mGoogleApiClient.isConnecting()){
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -170,6 +201,19 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
     }
 
     public void refreshWithLocation() {
+        if (mLastLocation != null) {
+            Location newLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+            if (mLastLocation.getLatitude() == newLocation.getLatitude() && mLastLocation.getLongitude() == newLocation.getLongitude()){
+                mRefreshLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRefreshLayout.setRefreshing(false);
+                    }
+                });
+                return;
+            }
+        }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
@@ -184,6 +228,15 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            mRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mRefreshLayout.setRefreshing(false);
+                }
+            });
+            Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -199,7 +252,7 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
     }
 
     private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -256,7 +309,7 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
 
             try {
                 String requestUri = String.format("https://showtime-server.herokuapp.com/showtimes?lat=%s&lon=%s&date=%s&city=%s", lat, lon, date, city);
-
+                Log.d("Showtime", requestUri);
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpResponse response = httpclient.execute(new HttpGet(requestUri));
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -264,7 +317,8 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
                 out.close();
                 result = out.toString();
             } catch (Exception e) {
-
+                mRefreshLayout.setRefreshing(false);
+                Toast.makeText(getActivity().getApplicationContext(), "No theaters found", Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
 
@@ -312,6 +366,8 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
                 mTheaterAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
             } catch (JSONException e) {
+                mRefreshLayout.setRefreshing(false);
+                Toast.makeText(getActivity().getApplicationContext(), "No theaters found", Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
         }

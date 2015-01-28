@@ -66,6 +66,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             mLayoutManager = new LinearLayoutManager(getActivity());
             RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview);
+            mRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
+            mRefreshLayout.setEnabled(false);
 
             mRecyclerView.setNestedScrollingEnabled(true);
             mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
