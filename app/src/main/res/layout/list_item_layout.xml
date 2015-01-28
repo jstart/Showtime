@@ -2,36 +2,39 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
     android:id="@+id/list_item_layout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:theme="@style/AppTheme"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
+    android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+    android:paddingRight="?android:attr/listPreferredItemPaddingRight"
+    android:paddingTop="8dp"
     android:weightSum="1"
     android:background="?android:selectableItemBackground"
     android:orientation="vertical">
 
     <TextView
         android:layout_width="fill_parent"
-        android:layout_height="40dp"
+        android:layout_height="23dp"
         android:minHeight="?android:attr/listPreferredItemHeight"
         android:gravity="center_vertical"
         android:id="@+id/list_item_theater_textview"
         android:textSize="@dimen/abc_text_size_medium_material"
         android:textColor="@color/primary_text_default_material_light"
-        android:text="AMC South Bay Galleria 16" />
+        android:text="AMC South Bay Galleria 16"
+        android:ellipsize="marquee" />
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="29dp"
-        android:minHeight="?android:attr/listPreferredItemHeight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="0dp"
         android:gravity="center_vertical"
         android:id="@+id/list_item_theater_address_textview"
         android:textSize="@dimen/abc_text_size_small_material"
         android:text="1815 Hawthorne Blvd., Redondo Beach, CA"
-        android:layout_weight="0.04"
-        android:maxLines="2"
+        android:maxLines="3"
         android:minLines="0"
-        android:layout_gravity="top"
-        android:layout_marginBottom="4dp" />
+        android:maxHeight="80dp"
+        android:autoText="false"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
 </LinearLayout>

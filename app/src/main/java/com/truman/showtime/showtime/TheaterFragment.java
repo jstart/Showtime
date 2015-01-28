@@ -233,7 +233,7 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
             mRefreshLayout.post(new Runnable() {
                 @Override
                 public void run() {
-                    mRefreshLayout.setRefreshing(false);
+                        mRefreshLayout.setRefreshing(false);
                 }
             });
             Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
