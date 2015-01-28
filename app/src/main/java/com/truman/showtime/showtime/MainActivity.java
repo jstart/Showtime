@@ -4,11 +4,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Window;
+import android.support.v7.widget.Toolbar;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -16,69 +14,70 @@ public class MainActivity extends ActionBarActivity {
     ViewPager mViewPager;
 
     protected void onCreate(Bundle savedInstanceState) {
-        supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
-
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setElevation(10);
 
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+        }
+        getSupportActionBar().setElevation(0);
+
         mDemoCollectionPagerAdapter =
                 new ShowtimePagerAdapter(
                         getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mDemoCollectionPagerAdapter);
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, new TheaterFragment())
+                    .commit();
+        }
         mViewPager.setOnPageChangeListener(
                 new ViewPager.SimpleOnPageChangeListener() {
                     @Override
                     public void onPageSelected(int position) {
                         // When swiping between pages, select the
                         // corresponding tab.
-                        getSupportActionBar().setSelectedNavigationItem(position);
+//                        getSupportActionBar().setSelectedNavigationItem(position);
                     }
                 });
-//        if (savedInstanceState == null) {
-//            getFragmentManager().beginTransaction()
-//                    .add(R.id.container, new TheaterFragment())
-//                    .commit();
+//        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+//        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+//
+//        // Create a tab listener that is called when the user changes tabs.
+//        android.support.v7.app.ActionBar.TabListener tabListener = new android.support.v7.app.ActionBar.TabListener() {
+//            @Override
+//            public void onTabSelected(android.support.v7.app.ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+//                mViewPager.setCurrentItem(tab.getPosition());
+//            }
+//
+//            @Override
+//            public void onTabUnselected(android.support.v7.app.ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+//
+//            }
+//
+//            @Override
+//            public void onTabReselected(android.support.v7.app.ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+//
+//            }
+//        };
+//
+//        for (int i = 0; i < 2; i++) {
+//            String title = "";
+//            switch (i) {
+//                case 1:
+//                    title = "Playing Nearby";
+//                    break;
+//                case 0:
+//                    title = "Theaters";
+//                    break;
+//            }
+//            actionBar.addTab(
+//                    actionBar.newTab()
+//                            .setText(title)
+//                            .setTabListener(tabListener));
 //        }
-        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-        // Create a tab listener that is called when the user changes tabs.
-        android.support.v7.app.ActionBar.TabListener tabListener = new android.support.v7.app.ActionBar.TabListener() {
-            @Override
-            public void onTabSelected(android.support.v7.app.ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-                mViewPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(android.support.v7.app.ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
-            }
-
-            @Override
-            public void onTabReselected(android.support.v7.app.ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
-            }
-        };
-
-        for (int i = 0; i < 2; i++) {
-            String title = "";
-            switch (i) {
-                case 1:
-                    title = "Playing Nearby";
-                    break;
-                case 0:
-                    title = "Theaters";
-                    break;
-            }
-            actionBar.addTab(
-                    actionBar.newTab()
-                            .setText(title)
-                            .setTabListener(tabListener));
-        }
-        getSupportActionBar().setHideOnContentScrollEnabled(true);
-        getSupportActionBar().setHideOffset(10);
     }
 
     public class ShowtimePagerAdapter extends FragmentStatePagerAdapter {
@@ -105,7 +104,11 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return "";
+            if (position == 1){
+                return "Nearby Movies";
+            }else {
+                return "Nearby Theaters";
+            }
         }
     }
 }

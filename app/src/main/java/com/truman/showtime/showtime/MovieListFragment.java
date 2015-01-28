@@ -1,7 +1,6 @@
 package com.truman.showtime.showtime;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -9,9 +8,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -35,26 +31,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
         public MovieListFragment() {
         }
 
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setHasOptionsMenu(true);
-        }
-
-        @Override
-        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-            super.onCreateOptionsMenu(menu, inflater);
-            inflater.inflate(R.menu.theaterfragment, menu);
-        }
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            if (item.getItemId() == R.id.action_settings) {
-                Intent settingsIntent = new Intent(getActivity(), SettingsActivity.class);
-                startActivity(settingsIntent);
-            }
-            return false;
-        }
         public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
             private Drawable mDivider;
 
@@ -87,9 +63,9 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
                                  Bundle savedInstanceState) {
             mMovieAdapter = new MovieAdapter();
 
-            View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             mLayoutManager = new LinearLayoutManager(getActivity());
-            RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview_movies);
+            RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview);
 
             mRecyclerView.setNestedScrollingEnabled(true);
             mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));

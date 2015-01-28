@@ -31,9 +31,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -71,26 +68,6 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
     public TheaterFragment() {
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.theaterfragment, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_settings) {
-            Intent settingsIntent = new Intent(getActivity(), SettingsActivity.class);
-            startActivity(settingsIntent);
-        }
-        return false;
-    }
     public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
         private Drawable mDivider;
 
@@ -129,7 +106,7 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
         mRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
         mRefreshLayout.setOnRefreshListener(this);
 
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview_theaters);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -172,7 +149,11 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
         super.onViewCreated(view, savedInstanceState);
         mRecyclerView.setNestedScrollingEnabled(true);
         final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
-
+        mRefreshLayout.post(new Runnable() {
+            @Override public void run() {
+                mRefreshLayout.setRefreshing(true);
+            }
+        });
     }
 
     protected synchronized void buildGoogleApiClient() {
