@@ -2,6 +2,8 @@ package com.truman.showtime.showtime;
 
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -48,6 +50,9 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
                 return rootView;
             }
             mMovieResults = new ArrayList<Movie>(theater.movies);
+            
+            ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
+            actionBar.setTitle(theater.name);
 
             return rootView;
         }
