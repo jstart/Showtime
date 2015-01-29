@@ -11,6 +11,14 @@ android {
         versionCode 4
         versionName '1.0'
     }
+    signingConfigs {
+        release {
+            storeFile file("../Showtime.jks")
+            storePassword "imation"
+            keyAlias "Showtime"
+            keyPassword "imation"
+        }
+    }
     buildTypes {
         debug {
             // enable crashlytics where you need
@@ -19,6 +27,9 @@ android {
         }
         release {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            ext.betaDistributionReleaseNotes="Release Notes for this build."
+            ext.betaDistributionGroupAliases="showtime"
+            signingConfig signingConfigs.release
         }
     }
     productFlavors {
