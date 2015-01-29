@@ -1,9 +1,7 @@
 package com.truman.showtime.showtime;
 
 import android.app.Application;
-
 import com.crashlytics.android.Crashlytics;
-
 import io.fabric.sdk.android.Fabric;
 
 /**

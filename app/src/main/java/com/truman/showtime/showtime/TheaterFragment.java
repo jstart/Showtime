@@ -95,7 +95,7 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mRecyclerView.setNestedScrollingEnabled(true);
+//        mRecyclerView.setNestedScrollingEnabled(true);
         final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
         mRefreshLayout.post(new Runnable() {
             @Override public void run() {
@@ -135,7 +135,6 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
     }
 
     public void refreshWithLocation() {
-
         if (mLastLocation != null) {
             Location newLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);

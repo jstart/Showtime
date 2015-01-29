@@ -38,7 +38,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
             mRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
             mRefreshLayout.setEnabled(false);
 
-            mRecyclerView.setNestedScrollingEnabled(true);
+//            mRecyclerView.setNestedScrollingEnabled(true);
             mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
             mRecyclerView.setLayoutManager(mLayoutManager);
             mRecyclerView.setAdapter(mMovieAdapter);
@@ -50,7 +50,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
                 return rootView;
             }
             mMovieResults = new ArrayList<Movie>(theater.movies);
-            
+
             ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
             actionBar.setTitle(theater.name);
 
