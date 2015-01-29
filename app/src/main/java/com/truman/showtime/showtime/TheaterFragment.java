@@ -15,10 +15,7 @@
  */
 package com.truman.showtime.showtime;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -30,7 +27,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,15 +39,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -61,12 +48,13 @@ import java.util.Locale;
 public class TheaterFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     TheaterAdapter mTheaterAdapter;
     ArrayList<ArrayList<String>> mTheaterResults;
-    ArrayList<JSONObject> mTheaterDetailsResults;
+    ArrayList<Theater> mTheaterDetailsResults;
 
     SwipeRefreshLayout mRefreshLayout;
     RecyclerView mRecyclerView;
     LinearLayoutManager mLayoutManager;
     GoogleApiClient mGoogleApiClient;
+    ShowtimeService.Showtimes mShowtimeService;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
 
@@ -78,38 +66,11 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
         refreshWithLocation();
     }
 
-    public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
-        private Drawable mDivider;
-
-        public SimpleDividerItemDecoration(Context context) {
-            mDivider = context.getResources().getDrawable(R.drawable.line_divider);
-        }
-
-        @Override
-        public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-            int left = parent.getPaddingLeft();
-            int right = parent.getWidth() - parent.getPaddingRight();
-
-            int childCount = parent.getChildCount();
-            for (int i = 0; i < childCount; i++) {
-                View child = parent.getChildAt(i);
-
-                RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
-
-                int top = child.getBottom() + params.bottomMargin;
-                int bottom = top + mDivider.getIntrinsicHeight();
-
-                mDivider.setBounds(left, top, right, bottom);
-                mDivider.draw(c);
-            }
-        }
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mTheaterResults = new ArrayList<ArrayList<String>>();
-        mTheaterDetailsResults = new ArrayList<JSONObject>();
+        mTheaterDetailsResults = new ArrayList<Theater>();
         mTheaterAdapter = new TheaterAdapter();
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -121,33 +82,6 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mTheaterAdapter);
-
-//        File cacheDir = getActivity().getCacheDir();
-//        File file = new File(cacheDir, "90504");
-//        int length = (int) file.length();
-//
-//        byte[] bytes = new byte[length];
-//
-//        FileInputStream in = null;
-//        try {
-//            in = new FileInputStream(file);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            in.read(bytes);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                in.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        String contents = new String(bytes);
-//        api.parseAndReloadResults(contents);
 
         buildGoogleApiClient();
         mGoogleApiClient.connect();
@@ -201,6 +135,7 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
     }
 
     public void refreshWithLocation() {
+
         if (mLastLocation != null) {
             Location newLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
@@ -224,7 +159,7 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-                api.execute(lat, lon, URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8"), "0");
+                api.execute(lat, lon, "0", URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -276,7 +211,7 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
         public void onClick(View v) {
             Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
             int index = mTheaterResults.indexOf(mTheater);
-            detailIntent.putExtra("TheaterDetails", mTheaterDetailsResults.get(index).toString());
+            detailIntent.putExtra("TheaterDetails", mTheaterDetailsResults.get(index));
             startActivity(detailIntent);
         }
     }
@@ -302,73 +237,42 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
         }
     }
 
-    public class ShowtimeApiManager extends AsyncTask<String, String, String> {
+    public class ShowtimeApiManager extends AsyncTask<String, String, List<Theater>> {
 
-        protected String getResponse(String lat, String lon, String city, String date) {
+        protected List<Theater> getResponse(String lat, String lon, String date, String city) {
             String result = null;
-
-            try {
-                String requestUri = String.format("https://showtime-server.herokuapp.com/showtimes?lat=%s&lon=%s&date=%s&city=%s", lat, lon, date, city);
-                Log.d("Showtime", requestUri);
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpResponse response = httpclient.execute(new HttpGet(requestUri));
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                response.getEntity().writeTo(out);
-                out.close();
-                result = out.toString();
-            } catch (Exception e) {
-                mRefreshLayout.setRefreshing(false);
-                Toast.makeText(getActivity().getApplicationContext(), "No theaters found", Toast.LENGTH_LONG).show();
-                e.printStackTrace();
-            }
-
-            return result;
+            mShowtimeService = ShowtimeService.adapter();
+            List<Theater> theaters = mShowtimeService.listTheaters(lat, lon, date, city);
+            return theaters;
         }
 
         @Override
-        protected String doInBackground(String... arg0) {
+        protected List<Theater> doInBackground(String... arg0) {
             return getResponse(arg0[0], arg0[1], arg0[2], arg0[3]);
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(List<Theater> result) {
             mTheaterResults.clear();
             parseAndReloadResults(result);
         }
 
-        public void parseAndReloadResults(String result){
-            try {
-                JSONArray jsonArray = new JSONArray(result);
-
-//                File cacheDir = getActivity().getCacheDir();
-//                File f = new File(cacheDir, "90504");
-//
-//                try {
-//                    FileOutputStream out = new FileOutputStream(
-//                            f);
-//                    out.write(result.getBytes());
-//                    out.close();
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-
-                for (int i = 0; i < jsonArray.length(); i++){
-                    JSONObject object = jsonArray.getJSONObject(i);
-                    mTheaterDetailsResults.add(object);
+        public void parseAndReloadResults(List<Theater> result){
+            if (result.size() > 0){
+                for (int i = 0; i < result.size(); i++){
+                    Theater theater = result.get(i);
+                    mTheaterDetailsResults.add(theater);
                     ArrayList<String> fields = new ArrayList<>();
-                    fields.add(object.getString("name"));
-                    fields.add(object.getString("address"));
+                    fields.add(theater.name);
+                    fields.add(theater.address);
 
                     mTheaterResults.add(fields);
                 }
                 mTheaterAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
-            } catch (JSONException e) {
+            } else {
                 mRefreshLayout.setRefreshing(false);
                 Toast.makeText(getActivity().getApplicationContext(), "No theaters found", Toast.LENGTH_LONG).show();
-                e.printStackTrace();
             }
         }
     }

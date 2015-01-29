@@ -6,9 +6,9 @@ android {
     buildToolsVersion '21.1.2'
     defaultConfig {
         applicationId 'com.truman.showtime.showtime'
-        minSdkVersion 21
+        minSdkVersion 9
         targetSdkVersion 21
-        versionCode 1
+        versionCode 4
         versionName '1.0'
     }
     buildTypes {
@@ -34,4 +34,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.+'
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.google.android.gms:play-services:6.5.+'
+    compile 'com.squareup.okhttp:okhttp:2.2.+'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.+'
+    compile 'com.squareup.retrofit:retrofit:1.9.+'
+    compile 'com.squareup.picasso:picasso:2.4.+'
 }

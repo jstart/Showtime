@@ -1,8 +1,5 @@
 package com.truman.showtime.showtime;
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,50 +9,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ctruman on 1/21/15.
  */
 public class MovieListFragment extends android.support.v4.app.Fragment {
         MovieAdapter mMovieAdapter;
-        ArrayList<JSONObject> mMovieResults;
+        ArrayList<Movie> mMovieResults;
         RecyclerView mRecyclerView;
         LinearLayoutManager mLayoutManager;
         SwipeRefreshLayout mRefreshLayout;
 
         public MovieListFragment() {
-        }
-
-        public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
-            private Drawable mDivider;
-
-            public SimpleDividerItemDecoration(Context context) {
-                mDivider = context.getResources().getDrawable(R.drawable.line_divider);
-            }
-
-            @Override
-            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-                int left = parent.getPaddingLeft();
-                int right = parent.getWidth() - parent.getPaddingRight();
-
-                int childCount = parent.getChildCount();
-                for (int i = 0; i < childCount; i++) {
-                    View child = parent.getChildAt(i);
-
-                    RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
-
-                    int top = child.getBottom() + params.bottomMargin;
-                    int bottom = top + mDivider.getIntrinsicHeight();
-
-                    mDivider.setBounds(left, top, right, bottom);
-                    mDivider.draw(c);
-                }
-            }
         }
 
         @Override
@@ -74,69 +41,41 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
             mRecyclerView.setLayoutManager(mLayoutManager);
             mRecyclerView.setAdapter(mMovieAdapter);
 
-            String jsonString = getActivity().getIntent().getStringExtra("TheaterDetails");
+            Theater theater = (Theater) getActivity().getIntent().getSerializableExtra("TheaterDetails");
 
-            if (jsonString == null){
-                mMovieResults = new ArrayList<JSONObject>();
+            if (theater == null){
+                mMovieResults = new ArrayList<Movie>();
                 return rootView;
             }
-            JSONObject theater;
-
-            try {
-                theater = new JSONObject(jsonString);
-                getActivity().setTitle(theater.optString("name"));
-                ArrayList<JSONObject> listdata = new ArrayList<JSONObject>();
-                JSONArray jArray = theater.getJSONArray("movies");
-                if (jArray != null) {
-                    for (int i=0;i<jArray.length();i++){
-                        try {
-                            listdata.add(jArray.getJSONObject(i));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                mMovieResults = new ArrayList<JSONObject>(listdata);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            mMovieResults = new ArrayList<Movie>(theater.movies);
 
             return rootView;
         }
 
     private class MovieHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-            private JSONObject mMovie;
+            private Movie mMovie;
 
             public MovieHolder(View itemView) {
                 super(itemView);
                 itemView.setOnClickListener(this);
             }
 
-            public void bindMovie(JSONObject movieObject) {
+            public void bindMovie(Movie movieObject) {
                 mMovie = movieObject;
                 TextView titleTextView = (TextView) itemView.findViewById(R.id.list_item_theater_textview);
                 TextView showtimeTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
+                titleTextView.setText(mMovie.name);
 
-                try {
-                    titleTextView.setText(mMovie.getString("name"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    JSONArray showtimes = mMovie.getJSONArray("showtimes");
-                    String showtimesList = "";
-                    for (int i = 0; i < showtimes.length(); i++) {
-                        String row = showtimes.optString(i);
-                        showtimesList += (row);
-                        if (i < showtimes.length() - 1){
-                            showtimesList += ", ";
-                        }
+                List<String> showtimes = mMovie.showtimes;
+                String showtimesList = "";
+                for (int i = 0; i < showtimes.size(); i++) {
+                    String row = showtimes.get(i);
+                    showtimesList += (row);
+                    if (i < showtimes.size() - 1){
+                        showtimesList += ", ";
                     }
-                    showtimeTextView.setText(showtimesList);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
+                showtimeTextView.setText(showtimesList);
             }
 
             @Override
@@ -159,7 +98,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment {
 
             @Override
             public void onBindViewHolder(MovieHolder holder, int pos) {
-                JSONObject movie = mMovieResults.get(pos);
+                Movie movie = mMovieResults.get(pos);
                 holder.bindMovie(movie);
             }
 
