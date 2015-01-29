@@ -26,6 +26,7 @@ android {
             ext.enableCrashlytics = false
         }
         release {
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             ext.betaDistributionReleaseNotes="Release Notes for this build."
             ext.betaDistributionGroupAliases="showtime"
