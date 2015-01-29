@@ -22,76 +22,70 @@ uses-permission#android.permission.ACCESS_COARSE_LOCATION
 ADDED from AndroidManifest.xml:5:5
 	android:name
 		ADDED from AndroidManifest.xml:5:22
-meta-data#com.crashlytics.ApiKey
-ADDED from AndroidManifest.xml:6:5
-	android:name
-		ADDED from AndroidManifest.xml:6:16
-	android:value
-		ADDED from AndroidManifest.xml:6:54
 compatible-screens
-ADDED from AndroidManifest.xml:8:5
+ADDED from AndroidManifest.xml:7:5
 screen#small+ldpi
+ADDED from AndroidManifest.xml:8:9
+	android:screenSize
+		ADDED from AndroidManifest.xml:8:17
+	android:screenDensity
+		ADDED from AndroidManifest.xml:8:44
+screen#small+mdpi
 ADDED from AndroidManifest.xml:9:9
 	android:screenSize
 		ADDED from AndroidManifest.xml:9:17
 	android:screenDensity
 		ADDED from AndroidManifest.xml:9:44
-screen#small+mdpi
+screen#small+hdpi
 ADDED from AndroidManifest.xml:10:9
 	android:screenSize
 		ADDED from AndroidManifest.xml:10:17
 	android:screenDensity
 		ADDED from AndroidManifest.xml:10:44
-screen#small+hdpi
+screen#small+xhdpi
 ADDED from AndroidManifest.xml:11:9
 	android:screenSize
 		ADDED from AndroidManifest.xml:11:17
 	android:screenDensity
 		ADDED from AndroidManifest.xml:11:44
-screen#small+xhdpi
+screen#small+480
 ADDED from AndroidManifest.xml:12:9
 	android:screenSize
 		ADDED from AndroidManifest.xml:12:17
 	android:screenDensity
 		ADDED from AndroidManifest.xml:12:44
-screen#small+480
-ADDED from AndroidManifest.xml:13:9
-	android:screenSize
-		ADDED from AndroidManifest.xml:13:17
-	android:screenDensity
-		ADDED from AndroidManifest.xml:13:44
 screen#normal+ldpi
+ADDED from AndroidManifest.xml:14:9
+	android:screenSize
+		ADDED from AndroidManifest.xml:14:17
+	android:screenDensity
+		ADDED from AndroidManifest.xml:14:45
+screen#normal+mdpi
 ADDED from AndroidManifest.xml:15:9
 	android:screenSize
 		ADDED from AndroidManifest.xml:15:17
 	android:screenDensity
 		ADDED from AndroidManifest.xml:15:45
-screen#normal+mdpi
+screen#normal+hdpi
 ADDED from AndroidManifest.xml:16:9
 	android:screenSize
 		ADDED from AndroidManifest.xml:16:17
 	android:screenDensity
 		ADDED from AndroidManifest.xml:16:45
-screen#normal+hdpi
+screen#normal+xhdpi
 ADDED from AndroidManifest.xml:17:9
 	android:screenSize
 		ADDED from AndroidManifest.xml:17:17
 	android:screenDensity
 		ADDED from AndroidManifest.xml:17:45
-screen#normal+xhdpi
+screen#normal+480
 ADDED from AndroidManifest.xml:18:9
 	android:screenSize
 		ADDED from AndroidManifest.xml:18:17
 	android:screenDensity
 		ADDED from AndroidManifest.xml:18:45
-screen#normal+480
-ADDED from AndroidManifest.xml:19:9
-	android:screenSize
-		ADDED from AndroidManifest.xml:19:17
-	android:screenDensity
-		ADDED from AndroidManifest.xml:19:45
 application
-ADDED from AndroidManifest.xml:21:5
+ADDED from AndroidManifest.xml:20:5
 MERGED from com.crashlytics.sdk.android:crashlytics:2.2.0:13:5
 MERGED from com.crashlytics.sdk.android:answers:1.1.0:11:5
 MERGED from io.fabric.sdk.android:fabric:1.1.0:11:5
@@ -100,21 +94,28 @@ MERGED from io.fabric.sdk.android:fabric:1.1.0:11:5
 MERGED from io.fabric.sdk.android:fabric:1.1.0:11:5
 MERGED from com.android.support:recyclerview-v7:21.0.3:17:5
 MERGED from com.android.support:support-v4:21.0.3:16:5
+MERGED from com.android.support:cardview-v7:21.0.3:16:5
 MERGED from com.android.support:appcompat-v7:21.0.3:16:5
 MERGED from com.android.support:support-v4:21.0.3:16:5
 MERGED from com.android.support:support-v4:21.0.3:16:5
 MERGED from com.google.android.gms:play-services:6.5.87:20:5
 MERGED from com.android.support:support-v4:21.0.3:16:5
 	android:label
-		ADDED from AndroidManifest.xml:25:9
-	android:allowBackup
-		ADDED from AndroidManifest.xml:23:9
-	android:icon
 		ADDED from AndroidManifest.xml:24:9
-	android:theme
-		ADDED from AndroidManifest.xml:26:9
-	android:name
+	android:allowBackup
 		ADDED from AndroidManifest.xml:22:9
+	android:icon
+		ADDED from AndroidManifest.xml:23:9
+	android:theme
+		ADDED from AndroidManifest.xml:25:9
+	android:name
+		ADDED from AndroidManifest.xml:21:9
+meta-data#com.crashlytics.ApiKey
+ADDED from AndroidManifest.xml:26:9
+	android:name
+		ADDED from AndroidManifest.xml:26:20
+	android:value
+		ADDED from AndroidManifest.xml:26:58
 meta-data#com.google.android.gms.version
 ADDED from AndroidManifest.xml:27:9
 MERGED from com.google.android.gms:play-services:6.5.87:21:9
@@ -170,6 +171,7 @@ MERGED from io.fabric.sdk.android:fabric:1.1.0:7:5
 MERGED from io.fabric.sdk.android:fabric:1.1.0:7:5
 MERGED from com.android.support:recyclerview-v7:21.0.3:15:5
 MERGED from com.android.support:support-v4:21.0.3:15:5
+MERGED from com.android.support:cardview-v7:21.0.3:15:5
 MERGED from com.android.support:appcompat-v7:21.0.3:15:5
 MERGED from com.android.support:support-v4:21.0.3:15:5
 MERGED from com.android.support:support-v4:21.0.3:15:5
