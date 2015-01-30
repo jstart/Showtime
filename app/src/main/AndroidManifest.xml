@@ -18,12 +18,12 @@
         <screen android:screenSize="normal" android:screenDensity="480" />
     </compatible-screens>
     <application
-        android:name=".ShowtimeApplication"
+        android:name="com.truman.showtime.showtime.ShowtimeApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
-        <meta-data android:name="com.crashlytics.ApiKey" android:value="ff6f76d45da103570f8070443d1760ea5199fc81"/>
+        <!--<meta-data android:name="com.crashlytics.ApiKey" android:value="ff6f76d45da103570f8070443d1760ea5199fc81"/>-->
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
         <activity

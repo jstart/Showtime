@@ -1,7 +1,9 @@
 package com.truman.showtime.showtime;
 
 import android.app.Application;
+
 import com.crashlytics.android.Crashlytics;
+
 import io.fabric.sdk.android.Fabric;
 
 /**
@@ -12,6 +14,10 @@ public class ShowtimeApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
+        new Thread() {
+            public void run() {
+                Fabric.with(getApplicationContext(), new Crashlytics());
+            }
+        };
     }
 }

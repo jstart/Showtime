@@ -13,7 +13,7 @@ public class DetailActivity extends ActionBarActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
-            getSupportActionBar().setElevation(5);
+            getSupportActionBar().setElevation(10);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         if (savedInstanceState == null) {

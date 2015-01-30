@@ -20,8 +20,8 @@ public class MainActivity extends ActionBarActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
+            getSupportActionBar().setElevation(10);
         }
-        getSupportActionBar().setElevation(5);
 
         mDemoCollectionPagerAdapter =
                 new ShowtimePagerAdapter(
