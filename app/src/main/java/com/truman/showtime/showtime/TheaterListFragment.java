@@ -30,7 +30,6 @@ import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.Time;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -288,7 +287,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             if (theaters == null) {
                 mShowtimeService = ShowtimeService.adapter();
                 theaters = mShowtimeService.listTheaters(lat, lon, date, city);
-                Log.d("Showtime", theaters.get(0).name);
             }
 
             return theaters;

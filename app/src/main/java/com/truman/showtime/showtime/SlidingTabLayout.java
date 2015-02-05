@@ -67,7 +67,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
     private static final int TITLE_OFFSET_DIPS = 24;
     private static final int TAB_VIEW_PADDING_DIPS = 16;
-    private static final int TAB_VIEW_TEXT_SIZE_SP = 12;
+    private static final int TAB_VIEW_TEXT_SIZE_SP = 18;
 
     private int mTitleOffset;
 
@@ -93,12 +93,12 @@ public class SlidingTabLayout extends HorizontalScrollView {
         // Disable the Scroll Bar
         setHorizontalScrollBarEnabled(false);
         // Make sure that the Tab Strips fills this View
-        setFillViewport(true);
+//        setFillViewport(true);
 
         mTitleOffset = (int) (TITLE_OFFSET_DIPS * getResources().getDisplayMetrics().density);
 
         mTabStrip = new SlidingTabStrip(context);
-        addView(mTabStrip, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        addView(mTabStrip, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
 
     /**
@@ -229,7 +229,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
         super.onAttachedToWindow();
 
         if (mViewPager != null) {
-            scrollToTab(mViewPager.getCurrentItem(), 0);
+//            scrollToTab(mViewPager.getCurrentItem(), 0);
         }
     }
 
@@ -268,7 +268,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
             int extraOffset = (selectedTitle != null)
                     ? (int) (positionOffset * selectedTitle.getWidth())
                     : 0;
-            scrollToTab(position, extraOffset);
+//            scrollToTab(position, extraOffset);
 
             if (mViewPagerPageChangeListener != null) {
                 mViewPagerPageChangeListener.onPageScrolled(position, positionOffset,
@@ -289,7 +289,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
         public void onPageSelected(int position) {
             if (mScrollState == ViewPager.SCROLL_STATE_IDLE) {
                 mTabStrip.onViewPagerPageChanged(position, 0f);
-                scrollToTab(position, 0);
+//                scrollToTab(position, 0);
             }
 
             if (mViewPagerPageChangeListener != null) {

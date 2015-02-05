@@ -1,5 +1,6 @@
 package com.truman.showtime.showtime;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -47,6 +48,7 @@ public class MainActivity extends ActionBarActivity {
                 });
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
+        mSlidingTabLayout.setSelectedIndicatorColors(Color.parseColor("#D50000"));
 //        mSlidingTabLayout.setBackgroundColor(R.color);
 //        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
 //        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
