@@ -16,4 +16,8 @@ public class Movie implements Serializable {
     String imdb;
     String trailer;
     List<String> showtimes;
+
+    String director;
+    String description;
+    List<Theater> theaters;
 }

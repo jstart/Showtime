@@ -18,7 +18,7 @@ public class DetailActivity extends ActionBarActivity {
         }
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new MovieListFragment())
+                    .add(R.id.container, new MoviesForTheaterFragment())
                     .commit();
         }
     }

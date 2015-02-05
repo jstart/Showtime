@@ -10,8 +10,9 @@ import android.support.v7.widget.Toolbar;
 
 
 public class MainActivity extends ActionBarActivity {
-    ShowtimePagerAdapter mDemoCollectionPagerAdapter;
-    ViewPager mViewPager;
+    private ShowtimePagerAdapter mDemoCollectionPagerAdapter;
+    private ViewPager mViewPager;
+    private SlidingTabLayout mSlidingTabLayout;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,6 +22,8 @@ public class MainActivity extends ActionBarActivity {
         if (toolbar != null) {
             setSupportActionBar(toolbar);
             getSupportActionBar().setElevation(10);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setIcon(R.drawable.ic_launcher);
         }
 
         mDemoCollectionPagerAdapter =
@@ -30,7 +33,7 @@ public class MainActivity extends ActionBarActivity {
         mViewPager.setAdapter(mDemoCollectionPagerAdapter);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new TheaterFragment())
+                    .add(R.id.container, new TheaterListFragment())
                     .commit();
         }
         mViewPager.setOnPageChangeListener(
@@ -42,6 +45,9 @@ public class MainActivity extends ActionBarActivity {
 //                        getSupportActionBar().setSelectedNavigationItem(position);
                     }
                 });
+        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        mSlidingTabLayout.setViewPager(mViewPager);
+//        mSlidingTabLayout.setBackgroundColor(R.color);
 //        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
 //        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 //
@@ -91,7 +97,7 @@ public class MainActivity extends ActionBarActivity {
             if (i == 1){
                 fragment = new MovieListFragment();
             }else {
-                fragment = new TheaterFragment();
+                fragment = new TheaterListFragment();
 
             }
             return fragment;
@@ -99,7 +105,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public int getCount() {
-            return 1;
+            return 2;
         }
 
         @Override

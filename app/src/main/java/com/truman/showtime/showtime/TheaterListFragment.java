@@ -15,6 +15,7 @@
  */
 package com.truman.showtime.showtime;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -25,9 +26,15 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.Time;
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -39,13 +46,17 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class TheaterFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class TheaterListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     TheaterAdapter mTheaterAdapter;
     ArrayList<ArrayList<String>> mTheaterResults;
     ArrayList<Theater> mTheaterDetailsResults;
@@ -58,7 +69,7 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
 
-    public TheaterFragment() {
+    public TheaterListFragment() {
     }
 
     @Override
@@ -175,6 +186,20 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
     }
 
     @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.theater_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterViewCompat.AdapterContextMenuInfo info = (AdapterViewCompat.AdapterContextMenuInfo) item.getMenuInfo();
+        // Handle context actions
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
     public void onConnectionSuspended(int i) {
 
     }
@@ -189,12 +214,14 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
         Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
     }
 
-    private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         private ArrayList<String> mTheater;
 
         public TheaterHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+            registerForContextMenu(itemView);
         }
 
         public void bindTheater(ArrayList<String> theaterFields) {
@@ -212,6 +239,12 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
             int index = mTheaterResults.indexOf(mTheater);
             detailIntent.putExtra("TheaterDetails", mTheaterDetailsResults.get(index));
             startActivity(detailIntent);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            getActivity().openContextMenu(v);
+            return true;
         }
     }
 
@@ -237,11 +270,27 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
     }
 
     public class ShowtimeApiManager extends AsyncTask<String, String, List<Theater>> {
-
+        String mCacheKey;
         protected List<Theater> getResponse(String lat, String lon, String date, String city) {
+            Time today = new Time(Time.getCurrentTimezone());
+            today.setToNow();
+            mCacheKey = "theaters:city:" + city + "date:" + today.month + today.monthDay + today.year;
             String result = null;
-            mShowtimeService = ShowtimeService.adapter();
-            List<Theater> theaters = mShowtimeService.listTheaters(lat, lon, date, city);
+            List<Theater> theaters = null;
+            try {
+                theaters = cachedResultsForKey(mCacheKey);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            if (theaters == null) {
+                mShowtimeService = ShowtimeService.adapter();
+                theaters = mShowtimeService.listTheaters(lat, lon, date, city);
+                Log.d("Showtime", theaters.get(0).name);
+            }
+
             return theaters;
         }
 
@@ -251,9 +300,31 @@ public class TheaterFragment extends android.support.v4.app.Fragment implements 
         }
 
         @Override
-        protected void onPostExecute(List<Theater> result) {
+        protected void onPostExecute(List<Theater> results) {
             mTheaterResults.clear();
-            parseAndReloadResults(result);
+            try {
+                cacheResults(results);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            parseAndReloadResults(results);
+        }
+
+        public void cacheResults(List<Theater> results) throws IOException {
+            FileOutputStream fos = getActivity().getApplicationContext().openFileOutput(mCacheKey, Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(results);
+            os.close();
+            fos.close();
+        }
+
+        public List<Theater> cachedResultsForKey(String cacheKey) throws IOException, ClassNotFoundException {
+            FileInputStream fis = getActivity().getApplicationContext().openFileInput(cacheKey);
+            ObjectInputStream is = new ObjectInputStream(fis);
+            List<Theater> theaters = (List<Theater>) is.readObject();
+            is.close();
+            fis.close();
+            return theaters;
         }
 
         public void parseAndReloadResults(List<Theater> result){

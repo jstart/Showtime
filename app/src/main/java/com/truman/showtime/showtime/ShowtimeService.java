@@ -4,6 +4,7 @@ import java.util.List;
 
 import retrofit.RestAdapter;
 import retrofit.http.GET;
+import retrofit.http.Path;
 import retrofit.http.Query;
 
 public class ShowtimeService {
@@ -12,6 +13,23 @@ public class ShowtimeService {
     interface Showtimes {
         @GET("/showtimes")
         List<Theater> listTheaters(
+                @Query("lat") String lat,
+                @Query("lon") String lon,
+                @Query("date") String date,
+                @Query("city") String city
+        );
+
+        @GET("/movies")
+        List<Movie> listMovies(
+                @Query("lat") String lat,
+                @Query("lon") String lon,
+                @Query("date") String date,
+                @Query("city") String city
+        );
+
+        @GET("/movie/{mid}")
+        Movie movieDetails(
+                @Path("mid") String mid,
                 @Query("lat") String lat,
                 @Query("lon") String lon,
                 @Query("date") String date,
