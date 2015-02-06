@@ -57,7 +57,7 @@ import java.util.Locale;
 
 public class TheaterListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     TheaterAdapter mTheaterAdapter;
-    ArrayList<Theater> mTheaterResults;
+    List<Theater> mTheaterResults;
 
     SwipeRefreshLayout mRefreshLayout;
     RecyclerView mRecyclerView;
@@ -235,9 +235,8 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         @Override
         public void onClick(View v) {
             Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
-            int index = mTheaterResults.indexOf(mTheater);
             detailIntent.putExtra("Type", "Theater");
-            detailIntent.putExtra("TheaterDetails", mTheaterResults.get(index));
+            detailIntent.putExtra("TheaterDetails", mTheater);
             startActivity(detailIntent);
         }
 
@@ -274,7 +273,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         protected List<Theater> getResponse(String lat, String lon, String date, String city) {
             Time today = new Time(Time.getCurrentTimezone());
             today.setToNow();
-            mCacheKey = "theaters:city:" + city + "date:" + today.month + today.monthDay + today.year;
+            mCacheKey = "theaters:city:" + city + ":date:" + today.month + today.monthDay + today.year;
             String result = null;
             List<Theater> theaters = null;
             try {
@@ -300,7 +299,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
         @Override
         protected void onPostExecute(List<Theater> results) {
-            mTheaterResults.clear();
+            mTheaterResults = results;
             try {
                 cacheResults(results);
             } catch (IOException e) {

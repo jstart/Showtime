@@ -57,8 +57,7 @@ import java.util.Locale;
 
 public class MovieListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     MovieAdapter mMovieAdapter;
-    ArrayList<ArrayList<String>> mMovieResults;
-    ArrayList<Movie> mMovieDetailsResults;
+    List<Movie> mMovieResults;
 
     SwipeRefreshLayout mRefreshLayout;
     RecyclerView mRecyclerView;
@@ -79,8 +78,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mMovieResults = new ArrayList<ArrayList<String>>();
-        mMovieDetailsResults = new ArrayList<Movie>();
+        mMovieResults = new ArrayList<Movie>();
         mMovieAdapter = new MovieAdapter();
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -213,7 +211,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     }
 
     private class MovieHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        private ArrayList<String> mMovie;
+        private Movie mMovie;
 
         public MovieHolder(View itemView) {
             super(itemView);
@@ -222,21 +220,20 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             registerForContextMenu(itemView);
         }
 
-        public void bindMovie(ArrayList<String> MovieFields) {
-            mMovie = MovieFields;
+        public void bindMovie(Movie movie) {
+            mMovie = movie;
             TextView titleTextView = (TextView) itemView.findViewById(R.id.list_item_theater_textview);
             TextView addressTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
 
-            titleTextView.setText(mMovie.get(0));
-            addressTextView.setText(mMovie.get(1));
+            titleTextView.setText(mMovie.name);
+            addressTextView.setText(mMovie.description);
         }
 
         @Override
         public void onClick(View v) {
             Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
-            int index = mMovieResults.indexOf(mMovie);
             detailIntent.putExtra("Type", "Movie");
-            detailIntent.putExtra("MovieDetails", mMovieDetailsResults.get(index));
+            detailIntent.putExtra("MovieDetails", mMovie);
             startActivity(detailIntent);
         }
 
@@ -258,8 +255,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         @Override
         public void onBindViewHolder(MovieHolder holder, int pos) {
-            ArrayList<String> crime = mMovieResults.get(pos);
-            holder.bindMovie(crime);
+            Movie movie = mMovieResults.get(pos);
+            holder.bindMovie(movie);
         }
 
         @Override
@@ -301,7 +298,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         @Override
         protected void onPostExecute(List<Movie> results) {
-            mMovieResults.clear();
+            mMovieResults = results;
             try {
                 cacheResults(results);
             } catch (IOException e) {
@@ -329,15 +326,11 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         public void parseAndReloadResults(List<Movie> result){
             if (result.size() > 0){
-                for (int i = 0; i < result.size(); i++){
-                    Movie Movie = result.get(i);
-                    mMovieDetailsResults.add(Movie);
-                    ArrayList<String> fields = new ArrayList<>();
-                    fields.add(Movie.name);
-                    fields.add(Movie.description);
-
-                    mMovieResults.add(fields);
-                }
+//                for (int i = 0; i < result.size(); i++){
+//                    Movie movie = result.get(i);
+//                    OMDBAPIResponse response = ShowtimeService.omdbAdapter().getResponse(movie.imdbID(), "json");
+//                    Log.d("Showtime", response.Poster);
+//                }
                 mMovieAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
             } else {

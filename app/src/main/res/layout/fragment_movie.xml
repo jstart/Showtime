@@ -1,0 +1,42 @@
+<com.truman.showtime.showtime.ScrollViewX xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:id="@+id/scrollview"
+    tools:context="com.truman.showtime.showtime.MovieFragment">
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:id="@+id/imageView"
+        android:layout_gravity="center_horizontal|top"
+        android:background="@color/accent_material_dark" />
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:id="@+id/imageView2"
+        android:layout_gravity="center_horizontal|top"
+        android:background="@color/accent_material_light" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:id="@+id/imageView3"
+            android:layout_gravity="center_horizontal|top"
+            android:background="@color/accent_material_light" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:id="@+id/imageView4"
+            android:layout_gravity="center_horizontal|top"
+            android:background="@color/accent_material_light" />
+    <!--<android.support.v7.widget.RecyclerView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:nestedScrollingEnabled="true"-->
+        <!--android:id="@+id/listview">-->
+    <!--</android.support.v7.widget.RecyclerView>-->
+    </TableLayout>
+</com.truman.showtime.showtime.ScrollViewX>

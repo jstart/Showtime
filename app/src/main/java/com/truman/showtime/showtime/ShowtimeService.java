@@ -39,9 +39,9 @@ public class ShowtimeService {
     }
 
     interface OMDBAPI {
-        @GET("")
-        List<Theater> getResponse(
-                @Query("id") String tmdbID,
+        @GET("/")
+        OMDBAPIResponse getResponse(
+                @Query("i") String tmdbID,
                 @Query("r") String format
         );
     }
@@ -57,7 +57,7 @@ public class ShowtimeService {
 
     public static OMDBAPI omdbAdapter() {
         RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(API_URL)
+                .setEndpoint(OMDB_API_URL)
                 .build();
 
         OMDBAPI omdbAdapter = restAdapter.create(OMDBAPI.class);
