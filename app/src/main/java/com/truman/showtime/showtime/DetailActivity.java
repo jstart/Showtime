@@ -17,11 +17,20 @@ public class DetailActivity extends ActionBarActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new MoviesForTheaterFragment())
-                    .commit();
+            String type = (String) getIntent().getSerializableExtra("Type");
+            if (type.equals("Theater")) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.container, new MoviesForTheaterFragment())
+                        .commit();
+            } else {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.container, new MovieFragment())
+                        .commit();
+            }
         }
     }
+
+
 
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {

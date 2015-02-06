@@ -1,6 +1,8 @@
 package com.truman.showtime.showtime;
 
+import android.annotation.TargetApi;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +17,7 @@ public class MainActivity extends ActionBarActivity {
     private ViewPager mViewPager;
     private SlidingTabLayout mSlidingTabLayout;
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -22,9 +25,9 @@ public class MainActivity extends ActionBarActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
-            getSupportActionBar().setElevation(10);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setIcon(R.drawable.ic_launcher);
+//            getSupportActionBar().setElevation(10);
+//            getSupportActionBar().setDisplayShowHomeEnabled(true);
+//            getSupportActionBar().setIcon(R.drawable.ic_launcher);
         }
 
         mDemoCollectionPagerAdapter =
@@ -41,15 +44,14 @@ public class MainActivity extends ActionBarActivity {
                 new ViewPager.SimpleOnPageChangeListener() {
                     @Override
                     public void onPageSelected(int position) {
-                        // When swiping between pages, select the
-                        // corresponding tab.
-//                        getSupportActionBar().setSelectedNavigationItem(position);
+
                     }
                 });
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        mSlidingTabLayout.setElevation(10);
         mSlidingTabLayout.setViewPager(mViewPager);
-        mSlidingTabLayout.setSelectedIndicatorColors(Color.parseColor("#D50000"));
-//        mSlidingTabLayout.setBackgroundColor(R.color);
+        mSlidingTabLayout.setSelectedIndicatorColors(Color.WHITE);
+        mSlidingTabLayout.setBackgroundColor(getResources().getColor(R.color.primary_dark));
 //        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
 //        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 //

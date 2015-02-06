@@ -57,8 +57,7 @@ import java.util.Locale;
 
 public class TheaterListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     TheaterAdapter mTheaterAdapter;
-    ArrayList<ArrayList<String>> mTheaterResults;
-    ArrayList<Theater> mTheaterDetailsResults;
+    ArrayList<Theater> mTheaterResults;
 
     SwipeRefreshLayout mRefreshLayout;
     RecyclerView mRecyclerView;
@@ -79,8 +78,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mTheaterResults = new ArrayList<ArrayList<String>>();
-        mTheaterDetailsResults = new ArrayList<Theater>();
+        mTheaterResults = new ArrayList<Theater>();
         mTheaterAdapter = new TheaterAdapter();
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -168,6 +166,8 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+                final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
+                actionBar.setSubtitle("near " + addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
                 api.execute(lat, lon, "0", URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8"));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -214,7 +214,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     }
 
     private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        private ArrayList<String> mTheater;
+        private Theater mTheater;
 
         public TheaterHolder(View itemView) {
             super(itemView);
@@ -223,20 +223,21 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             registerForContextMenu(itemView);
         }
 
-        public void bindTheater(ArrayList<String> theaterFields) {
-            mTheater = theaterFields;
+        public void bindTheater(Theater theater) {
+            mTheater = theater;
             TextView titleTextView = (TextView) itemView.findViewById(R.id.list_item_theater_textview);
             TextView addressTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
 
-            titleTextView.setText(mTheater.get(0));
-            addressTextView.setText(mTheater.get(1));
+            titleTextView.setText(mTheater.name);
+            addressTextView.setText(mTheater.address);
         }
 
         @Override
         public void onClick(View v) {
             Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
             int index = mTheaterResults.indexOf(mTheater);
-            detailIntent.putExtra("TheaterDetails", mTheaterDetailsResults.get(index));
+            detailIntent.putExtra("Type", "Theater");
+            detailIntent.putExtra("TheaterDetails", mTheaterResults.get(index));
             startActivity(detailIntent);
         }
 
@@ -258,8 +259,8 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
         @Override
         public void onBindViewHolder(TheaterHolder holder, int pos) {
-            ArrayList<String> crime = mTheaterResults.get(pos);
-            holder.bindTheater(crime);
+            Theater theater = mTheaterResults.get(pos);
+            holder.bindTheater(theater);
         }
 
         @Override
@@ -327,15 +328,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
         public void parseAndReloadResults(List<Theater> result){
             if (result.size() > 0){
-                for (int i = 0; i < result.size(); i++){
-                    Theater theater = result.get(i);
-                    mTheaterDetailsResults.add(theater);
-                    ArrayList<String> fields = new ArrayList<>();
-                    fields.add(theater.name);
-                    fields.add(theater.address);
-
-                    mTheaterResults.add(fields);
-                }
                 mTheaterAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
             } else {

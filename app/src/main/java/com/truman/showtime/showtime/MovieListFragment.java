@@ -235,6 +235,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         public void onClick(View v) {
             Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
             int index = mMovieResults.indexOf(mMovie);
+            detailIntent.putExtra("Type", "Movie");
             detailIntent.putExtra("MovieDetails", mMovieDetailsResults.get(index));
             startActivity(detailIntent);
         }

@@ -9,6 +9,7 @@ import retrofit.http.Query;
 
 public class ShowtimeService {
     private static final String API_URL = "https://showtime-server.herokuapp.com";
+    private static final String OMDB_API_URL = "http://www.omdbapi.com";
 
     interface Showtimes {
         @GET("/showtimes")
@@ -37,6 +38,14 @@ public class ShowtimeService {
         );
     }
 
+    interface OMDBAPI {
+        @GET("")
+        List<Theater> getResponse(
+                @Query("id") String tmdbID,
+                @Query("r") String format
+        );
+    }
+
     public static Showtimes adapter() {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(API_URL)
@@ -44,5 +53,14 @@ public class ShowtimeService {
 
         Showtimes showtimeAdapter = restAdapter.create(Showtimes.class);
         return showtimeAdapter;
+    }
+
+    public static OMDBAPI omdbAdapter() {
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint(API_URL)
+                .build();
+
+        OMDBAPI omdbAdapter = restAdapter.create(OMDBAPI.class);
+        return omdbAdapter;
     }
 }
