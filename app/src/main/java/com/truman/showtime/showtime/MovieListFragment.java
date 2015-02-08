@@ -21,6 +21,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -170,14 +171,21 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 e.printStackTrace();
             }
         } else {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-            mRefreshLayout.post(new Runnable() {
-                @Override
-                public void run() {
+            if (Build.MODEL.contains("google_sdk") ||
+                    Build.MODEL.contains("Emulator") ||
+                    Build.MODEL.contains("Android SDK")) {
+                ShowtimeApiManager api = new ShowtimeApiManager();
+                api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
+            } else {
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+                mRefreshLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
                         mRefreshLayout.setRefreshing(false);
-                }
-            });
-            Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
+                    }
+                });
+                Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -208,6 +216,13 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
+        mRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mRefreshLayout.setRefreshing(false);
+            }
+        });
+
     }
 
     private class MovieHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -270,7 +285,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         protected List<Movie> getResponse(String lat, String lon, String date, String city) {
             Time today = new Time(Time.getCurrentTimezone());
             today.setToNow();
-            mCacheKey = "movies:city:" + city + "date:" + today.month + today.monthDay + today.year;
+            mCacheKey = "movies:city:" + city + ":date:" + today.month + today.monthDay + today.year;
             String result = null;
             List<Movie> movies = null;
             try {
@@ -285,7 +300,12 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 mShowtimeService = ShowtimeService.adapter();
                 movies = mShowtimeService.listMovies(lat, lon, date, city);
 //                Movie movie = mShowtimeService.movieDetails("ddf88042ef931de1", lat, lon, date, city);
-//                Log.d("Showtime", movie.name.toString());
+                for (int i = 0; i < movies.size(); i++){
+                    Movie movie = movies.get(i);
+                    if (!movie.imdbID().equalsIgnoreCase("false")){
+                        movie.response = ShowtimeService.omdbAdapter().getResponse(movie.imdbID(), "json");
+                    }
+                }
             }
 
             return movies;
@@ -326,11 +346,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         public void parseAndReloadResults(List<Movie> result){
             if (result.size() > 0){
-//                for (int i = 0; i < result.size(); i++){
-//                    Movie movie = result.get(i);
-//                    OMDBAPIResponse response = ShowtimeService.omdbAdapter().getResponse(movie.imdbID(), "json");
-//                    Log.d("Showtime", response.Poster);
-//                }
                 mMovieAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
             } else {

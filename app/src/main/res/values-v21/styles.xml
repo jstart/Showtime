@@ -5,18 +5,19 @@
         <item name="colorControlHighlight">@color/primary</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:statusBarColor">@color/status_bar</item>
+
         <item name="colorAccent">@color/accent</item>
-        <item name="windowActionBar">false</item>
-        <item name="android:windowActionBar">false</item>
 
         <item name="android:textColorSecondary">@color/title_primary</item>
         <item name="android:textColorPrimary">@color/title_primary</item>
         <item name="android:textColor">@color/text_secondary</item>
-        <item name="android:navigationBarColor">@color/primary_dark</item>
 
         <item name="android:windowActionBarOverlay">true</item>
         <item name="windowActionBarOverlay">true</item>
 
+        <item name="windowActionBar">false</item>
+        <item name="android:windowActionBar">false</item>
         <!--<item name="android:windowTranslucentStatus">true</item>-->
         <item name="android:fitsSystemWindows">false</item>
         <!--<item name="android:windowNoTitle">false</item>-->

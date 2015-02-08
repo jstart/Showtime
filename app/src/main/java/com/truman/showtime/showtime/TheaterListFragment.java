@@ -21,6 +21,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -30,6 +31,7 @@ import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -56,14 +58,15 @@ import java.util.List;
 import java.util.Locale;
 
 public class TheaterListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
-    TheaterAdapter mTheaterAdapter;
-    List<Theater> mTheaterResults;
+    private TheaterAdapter mTheaterAdapter;
+    private List<Theater> mTheaterResults;
+    private String mContextTheaterAddress;
 
-    SwipeRefreshLayout mRefreshLayout;
-    RecyclerView mRecyclerView;
-    LinearLayoutManager mLayoutManager;
-    GoogleApiClient mGoogleApiClient;
-    ShowtimeService.Showtimes mShowtimeService;
+    private SwipeRefreshLayout mRefreshLayout;
+    private RecyclerView mRecyclerView;
+    private LinearLayoutManager mLayoutManager;
+    private GoogleApiClient mGoogleApiClient;
+    private ShowtimeService.Showtimes mShowtimeService;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
 
@@ -173,14 +176,21 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 e.printStackTrace();
             }
         } else {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-            mRefreshLayout.post(new Runnable() {
-                @Override
-                public void run() {
+            if (Build.MODEL.contains("google_sdk") ||
+                    Build.MODEL.contains("Emulator") ||
+                    Build.MODEL.contains("Android SDK")) {
+                ShowtimeApiManager api = new ShowtimeApiManager();
+                api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
+            } else {
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+                mRefreshLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
                         mRefreshLayout.setRefreshing(false);
-                }
-            });
-            Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
+                    }
+                });
+                Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -195,6 +205,20 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     public boolean onContextItemSelected(MenuItem item) {
         AdapterViewCompat.AdapterContextMenuInfo info = (AdapterViewCompat.AdapterContextMenuInfo) item.getMenuInfo();
         // Handle context actions
+        if (item.getTitle().equals("Directions")){
+            // Create a Uri from an intent string. Use the result to create an Intent.
+//            Uri gmmIntentUri = Uri.parse("geo=0,0?q=" + mContextTheaterAddress);
+//
+//            // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+//            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+//            // Make the Intent explicit by setting the Google Maps package
+//            mapIntent.setPackage("com.google.android.apps.maps");
+//
+//            // Attempt to start an activity that can handle the Intent
+//            startActivity(mapIntent);
+        } else if (item.getTitle().equals("Share")){
+
+        }
         return super.onContextItemSelected(item);
     }
 
@@ -210,7 +234,20 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
+        Log.d("Showtime", Build.MODEL);
+        if (Build.MODEL.contains("google_sdk") ||
+                Build.MODEL.contains("Emulator") ||
+                Build.MODEL.contains("Android SDK")) {
+            refreshWithLocation();
+        } else {
+            Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
+            mRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mRefreshLayout.setRefreshing(false);
+                }
+            });
+        }
     }
 
     private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -242,7 +279,8 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
         @Override
         public boolean onLongClick(View v) {
-            getActivity().openContextMenu(v);
+            mContextTheaterAddress = new String(mTheater.address);
+//            getActivity().openContextMenu(v);
             return true;
         }
     }

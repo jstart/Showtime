@@ -13,11 +13,10 @@ public class DetailActivity extends ActionBarActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
-            getSupportActionBar().setElevation(10);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         if (savedInstanceState == null) {
-            String type = (String) getIntent().getSerializableExtra("Type");
+            String type = (String) getIntent().getSerializableExtra("Type") != null ? (String) getIntent().getSerializableExtra("Type") : "";
             if (type.equals("Theater")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.container, new MoviesForTheaterFragment())

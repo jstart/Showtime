@@ -49,6 +49,7 @@ public class ShowtimeService {
     public static Showtimes adapter() {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(API_URL)
+                .setLogLevel(RestAdapter.LogLevel.NONE)
                 .build();
 
         Showtimes showtimeAdapter = restAdapter.create(Showtimes.class);
@@ -58,6 +59,7 @@ public class ShowtimeService {
     public static OMDBAPI omdbAdapter() {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(OMDB_API_URL)
+                .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
 
         OMDBAPI omdbAdapter = restAdapter.create(OMDBAPI.class);

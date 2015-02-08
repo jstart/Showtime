@@ -20,6 +20,7 @@ public class Movie implements Serializable {
     String director;
     String description;
     List<Theater> theaters;
+    OMDBAPIResponse response;
 
     public String imdbID() {
         return imdb.replaceFirst(".*/([^/?]+).*", "$1");

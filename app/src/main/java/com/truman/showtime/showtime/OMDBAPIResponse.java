@@ -7,4 +7,8 @@ import java.io.Serializable;
  */
 public class OMDBAPIResponse implements Serializable {
     String Poster;
+
+    String largePoster(){
+        return Poster.replace("300.jpg", "2000.jpg");
+    }
 }

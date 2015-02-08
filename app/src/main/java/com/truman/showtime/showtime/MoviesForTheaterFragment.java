@@ -1,5 +1,6 @@
 package com.truman.showtime.showtime;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -32,7 +33,7 @@ public class MoviesForTheaterFragment extends android.support.v4.app.Fragment {
                                  Bundle savedInstanceState) {
             mMovieAdapter = new MovieAdapter();
 
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_theaters_for_movie, container, false);
             mLayoutManager = new LinearLayoutManager(getActivity());
             RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview);
             mRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
@@ -84,10 +85,10 @@ public class MoviesForTheaterFragment extends android.support.v4.app.Fragment {
 
             @Override
             public void onClick(View v) {
-//                Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
-//                int index = mMovieResults.indexOf(mMovie);
-//                detailIntent.putExtra("TheaterDetails", mTheaterDetailsResults.get(index).toString());
-//                startActivity(detailIntent);
+                Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
+                detailIntent.putExtra("MovieDetails", mMovie);
+                detailIntent.putExtra("Type", "Movie");
+                startActivity(detailIntent);
             }
         }
 

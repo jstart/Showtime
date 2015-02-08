@@ -1,8 +1,6 @@
 package com.truman.showtime.showtime;
 
-import android.annotation.TargetApi;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,7 +15,6 @@ public class MainActivity extends ActionBarActivity {
     private ViewPager mViewPager;
     private SlidingTabLayout mSlidingTabLayout;
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -44,14 +41,29 @@ public class MainActivity extends ActionBarActivity {
                 new ViewPager.SimpleOnPageChangeListener() {
                     @Override
                     public void onPageSelected(int position) {
-
                     }
                 });
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-        mSlidingTabLayout.setElevation(10);
+//        mSlidingTabLayout.setElevation(10);
         mSlidingTabLayout.setViewPager(mViewPager);
         mSlidingTabLayout.setSelectedIndicatorColors(Color.WHITE);
         mSlidingTabLayout.setBackgroundColor(getResources().getColor(R.color.primary_dark));
+        mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                mViewPager.setCurrentItem(position, true);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 //        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
 //        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 //
@@ -115,9 +127,9 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             if (position == 1){
-                return "Nearby Movies";
+                return "Movies";
             }else {
-                return "Nearby Theaters";
+                return "Theaters";
             }
         }
     }

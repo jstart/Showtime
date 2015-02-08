@@ -27,7 +27,8 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.HorizontalScrollView;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
@@ -46,7 +47,7 @@ import android.widget.TextView;
  * The views used as tabs can be customized by calling {@link #setCustomTabView(int, int)},
  * providing the layout ID of your custom layout.
  */
-public class SlidingTabLayout extends HorizontalScrollView {
+public class SlidingTabLayout extends LinearLayout {
 
     /**
      * Allows complete control over the colors drawn in the tab layout. Set with
@@ -68,7 +69,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
     private static final int TITLE_OFFSET_DIPS = 24;
     private static final int TAB_VIEW_PADDING_DIPS = 16;
-    private static final int TAB_VIEW_TEXT_SIZE_SP = 12;
+    private static final int TAB_VIEW_TEXT_SIZE_SP = 14;
 
     private int mTitleOffset;
 
@@ -173,6 +174,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
         TextView textView = new TextView(context);
         textView.setTextColor(Color.WHITE);
         textView.setGravity(Gravity.CENTER);
+        textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, TAB_VIEW_TEXT_SIZE_SP);
         textView.setTypeface(Typeface.DEFAULT);
 
@@ -221,8 +223,10 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
             tabTitleView.setText(adapter.getPageTitle(i));
             tabView.setOnClickListener(tabClickListener);
-
-            mTabStrip.addView(tabView);
+            LinearLayout layout = new LinearLayout(getContext());
+            layout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 0.5f));
+            layout.addView(tabView);
+            mTabStrip.addView(layout);
         }
     }
 
@@ -305,7 +309,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
         @Override
         public void onClick(View v) {
             for (int i = 0; i < mTabStrip.getChildCount(); i++) {
-                if (v == mTabStrip.getChildAt(i)) {
+                if (v.getParent() == mTabStrip.getChildAt(i)) {
                     mViewPager.setCurrentItem(i);
                     return;
                 }
