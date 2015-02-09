@@ -25,4 +25,17 @@ public class Movie implements Serializable {
     public String imdbID() {
         return imdb.replaceFirst(".*/([^/?]+).*", "$1");
     }
+    public String showtimesString() {
+        if(showtimes == null)
+            return "";
+        String showtimesList = "";
+        for (int i = 0; i < showtimes.size(); i++) {
+            String row = showtimes.get(i);
+            showtimesList += (row);
+            if (i < showtimes.size() - 1){
+                showtimesList += ", ";
+            }
+        }
+        return showtimesList;
+    }
 }

@@ -1,7 +1,6 @@
 package com.truman.showtime.showtime;
 
 import android.app.Fragment;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -17,19 +16,25 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
+import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MovieFragment extends android.support.v4.app.Fragment {
+public class MovieFragment extends android.support.v4.app.Fragment implements ObservableScrollViewCallbacks {
 
     private Movie mMovie;
     private ActionBar mToolbar;
-    private RecyclerView mRecyclerView;
+    private ObservableRecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private TheaterAdapter mTheaterAdapter;
+    ColorDrawable cd;
 
     private static final int HEADER = 0;
     private static final int SHOWTIME = 1;
@@ -42,6 +47,9 @@ public class MovieFragment extends android.support.v4.app.Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMovie = (Movie) getActivity().getIntent().getSerializableExtra("MovieDetails");
+        if (mMovie.theaters == null){
+            mMovie.theaters = new ArrayList<Theater>();
+        }
     }
 
     @Override
@@ -62,7 +70,8 @@ public class MovieFragment extends android.support.v4.app.Fragment {
 
         TextView descriptionView = (TextView)  mTheaterAdapter.mHeaderView.findViewById(R.id.descriptionView);
         descriptionView.setText(mMovie.description);
-        mRecyclerView = (RecyclerView) rootView;
+        mRecyclerView = (ObservableRecyclerView) rootView;
+        mRecyclerView.setScrollViewCallbacks(this);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -77,28 +86,9 @@ public class MovieFragment extends android.support.v4.app.Fragment {
         super.onViewCreated(view, savedInstanceState);
         if (mToolbar != null){
             mToolbar.setTitle("");
-            final ColorDrawable cd = new ColorDrawable(new Color().parseColor("#B71C1C"));
-            cd.setAlpha(0);
+            cd = new ColorDrawable(new Color().parseColor("#B71C1C"));
             mToolbar.setBackgroundDrawable(cd);
-            mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    cd.setAlpha(getAlphaforActionBar(recyclerView.getScrollY()));
-                }
-
-                private int getAlphaforActionBar(int scrollY) {
-                    int minDist = 0, maxDist = 650;
-                    if (scrollY > maxDist) {
-                        return 255;
-                    } else if (scrollY < minDist) {
-                        return 0;
-                    } else {
-                        int alpha = 0;
-                        alpha = (int) ((255.0 / maxDist) * scrollY);
-                        return alpha;
-                    }
-                }
-            });
+            cd.setAlpha(0);
         }
 
         mHeroImage = (ImageView)  mTheaterAdapter.mHeaderView.findViewById(R.id.imageView);
@@ -108,6 +98,35 @@ public class MovieFragment extends android.support.v4.app.Fragment {
                 Picasso.with(getActivity()).load(mMovie.response.largePoster()).into(mHeroImage);
             }
         }
+    }
+
+    @Override
+    public void onScrollChanged(int i, boolean b, boolean b2) {
+            cd.setAlpha(getAlphaForActionBar(i));
+    }
+
+    private int getAlphaForActionBar(int scrollY) {
+        int minDist = 0, maxDist = 650;
+        if (scrollY > maxDist) {
+            mToolbar.setTitle(mMovie.name);
+            return 255;
+        } else if (scrollY < minDist) {
+            return 0;
+        } else {
+            int alpha = 0;
+            alpha = (int) ((255.0 / maxDist) * scrollY);
+            mToolbar.setTitle("");
+            return alpha;
+        }
+    }
+    @Override
+    public void onDownMotionEvent() {
+
+    }
+
+    @Override
+    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
+
     }
 
     private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -124,24 +143,24 @@ public class MovieFragment extends android.support.v4.app.Fragment {
             mTheater = theater;
             if (itemView.getClass().equals(LinearLayout.class)){
                 TextView titleTextView = (TextView) itemView.findViewById(R.id.list_item_theater_textview);
-                TextView addressTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
+                TextView showtimesTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
 
                 titleTextView.setText(mTheater.name);
-                addressTextView.setText(mTheater.address);
+                showtimesTextView.setText(mTheater.showtimesString());
             }
         }
 
         @Override
         public void onClick(View v) {
-            Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
-            detailIntent.putExtra("Type", "Theater");
-            detailIntent.putExtra("TheaterDetails", mTheater);
-            startActivity(detailIntent);
+//            Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
+//            detailIntent.putExtra("Type", "Theater");
+//            detailIntent.putExtra("TheaterDetails", mTheater);
+//            startActivity(detailIntent);
         }
 
         @Override
         public boolean onLongClick(View v) {
-            getActivity().openContextMenu(v);
+//            getActivity().openContextMenu(v);
             return true;
         }
     }

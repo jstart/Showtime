@@ -1,7 +1,7 @@
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
     android:id="@+id/recyclerView"
     tools:context="com.truman.showtime.showtime.MovieFragment">
-</android.support.v7.widget.RecyclerView>
+</com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView>

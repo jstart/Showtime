@@ -40,6 +40,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
+import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -56,12 +59,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MovieListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class MovieListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ObservableScrollViewCallbacks {
     MovieAdapter mMovieAdapter;
     List<Movie> mMovieResults;
 
     SwipeRefreshLayout mRefreshLayout;
-    RecyclerView mRecyclerView;
+    ObservableRecyclerView mRecyclerView;
     LinearLayoutManager mLayoutManager;
     GoogleApiClient mGoogleApiClient;
     ShowtimeService.Showtimes mShowtimeService;
@@ -86,7 +89,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         mRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
         mRefreshLayout.setOnRefreshListener(this);
 
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview);
+        mRecyclerView = (ObservableRecyclerView) rootView.findViewById(R.id.listview);
+        mRecyclerView.setScrollViewCallbacks(this);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -126,6 +130,28 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         if (mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
+        }
+    }
+
+
+    @Override
+    public void onScrollChanged(int i, boolean b, boolean b2) {
+
+    }
+
+    @Override
+    public void onDownMotionEvent() {
+
+    }
+
+    @Override
+    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
+        final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
+        actionBar.setShowHideAnimationEnabled(true);
+        if (scrollState == ScrollState.DOWN){
+            actionBar.show();
+        } else if (scrollState == ScrollState.UP){
+            actionBar.show();
         }
     }
 

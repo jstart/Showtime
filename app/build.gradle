@@ -51,6 +51,7 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.2.+'
     compile 'com.squareup.retrofit:retrofit:+'
     compile 'com.squareup.picasso:picasso:2.+'
+    compile 'com.github.ksoichiro:android-observablescrollview:1.5.+'
     compile 'com.google.apis:google-api-services-youtube:v3-rev120-1.+'
     compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
         transitive = true

@@ -72,15 +72,7 @@ public class MoviesForTheaterFragment extends android.support.v4.app.Fragment {
                 titleTextView.setText(mMovie.name);
 
                 List<String> showtimes = mMovie.showtimes;
-                String showtimesList = "";
-                for (int i = 0; i < showtimes.size(); i++) {
-                    String row = showtimes.get(i);
-                    showtimesList += (row);
-                    if (i < showtimes.size() - 1){
-                        showtimesList += ", ";
-                    }
-                }
-                showtimeTextView.setText(showtimesList);
+                showtimeTextView.setText(mMovie.showtimesString());
             }
 
             @Override

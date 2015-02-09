@@ -41,6 +41,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
+import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -57,13 +60,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class TheaterListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class TheaterListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ObservableScrollViewCallbacks {
     private TheaterAdapter mTheaterAdapter;
     private List<Theater> mTheaterResults;
     private String mContextTheaterAddress;
 
     private SwipeRefreshLayout mRefreshLayout;
-    private RecyclerView mRecyclerView;
+    private ObservableRecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private GoogleApiClient mGoogleApiClient;
     private ShowtimeService.Showtimes mShowtimeService;
@@ -88,7 +91,8 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         mRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
         mRefreshLayout.setOnRefreshListener(this);
 
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview);
+        mRecyclerView = (ObservableRecyclerView) rootView.findViewById(R.id.listview);
+        mRecyclerView.setScrollViewCallbacks(this);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -106,8 +110,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-//        mRecyclerView.setNestedScrollingEnabled(true);
-        final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
         mRefreshLayout.post(new Runnable() {
             @Override public void run() {
                 mRefreshLayout.setRefreshing(true);
@@ -247,6 +249,27 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                     mRefreshLayout.setRefreshing(false);
                 }
             });
+        }
+    }
+
+    @Override
+    public void onScrollChanged(int i, boolean b, boolean b2) {
+
+    }
+
+    @Override
+    public void onDownMotionEvent() {
+
+    }
+
+    @Override
+    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
+        final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
+        actionBar.setShowHideAnimationEnabled(true);
+        if (scrollState == ScrollState.DOWN){
+            actionBar.show();
+        } else if (scrollState == ScrollState.UP){
+            actionBar.show();
         }
     }
 
