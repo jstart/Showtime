@@ -1,6 +1,7 @@
 package com.truman.showtime.showtime;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -12,13 +13,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
+import com.google.android.youtube.player.YouTubeIntents;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -34,7 +38,10 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     private ObservableRecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private TheaterAdapter mTheaterAdapter;
-    ColorDrawable cd;
+    private TextView mDescriptionView;
+    private TextView mShowtimesTitleView;
+    private View mSeparatorView;
+    private ColorDrawable cd;
 
     private static final int HEADER = 0;
     private static final int SHOWTIME = 1;
@@ -55,21 +62,15 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_movie, container, false);
-
         mTheaterAdapter = new TheaterAdapter();
 
         mTheaterAdapter.mHeaderView = inflater.inflate(R.layout.include_movie_header, container, false);
 
-        TextView titleView = (TextView)  mTheaterAdapter.mHeaderView.findViewById(R.id.titleView);
+        TextView titleView = (TextView) mTheaterAdapter.mHeaderView.findViewById(R.id.titleView);
         titleView.setText(mMovie.name);
-
-        TextView detailsView = (TextView)  mTheaterAdapter.mHeaderView.findViewById(R.id.detailsView);
+        TextView detailsView = (TextView) mTheaterAdapter.mHeaderView.findViewById(R.id.detailsView);
         detailsView.setText("Genre: " + mMovie.genre + "\nRating: " + mMovie.rating + "\nRuntime: " + mMovie.runtime);
-
-        TextView descriptionView = (TextView)  mTheaterAdapter.mHeaderView.findViewById(R.id.descriptionView);
-        descriptionView.setText(mMovie.description);
         mRecyclerView = (ObservableRecyclerView) rootView;
         mRecyclerView.setScrollViewCallbacks(this);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
@@ -77,7 +78,19 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mTheaterAdapter);
         mTheaterAdapter.notifyDataSetChanged();
-        mToolbar = ((ActionBarActivity)getActivity()).getSupportActionBar();
+        mDescriptionView = (TextView) mTheaterAdapter.mHeaderView.findViewById(R.id.descriptionView);
+        mShowtimesTitleView = (TextView) mTheaterAdapter.mHeaderView.findViewById(R.id.showtimesTitleView);
+        mSeparatorView = (View) mTheaterAdapter.mHeaderView.findViewById(R.id.separator);
+        if (mMovie.description != null) {
+            mDescriptionView.setText(mMovie.description);
+        } else {
+            mDescriptionView.setAlpha(0);
+            mShowtimesTitleView.setAlpha(0);
+            mSeparatorView.setAlpha(0);
+            ProgressBar bar = new ProgressBar(getActivity().getBaseContext());
+
+        }
+        mToolbar = ((ActionBarActivity) getActivity()).getSupportActionBar();
         return rootView;
     }
 
@@ -92,10 +105,23 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         }
 
         mHeroImage = (ImageView)  mTheaterAdapter.mHeaderView.findViewById(R.id.imageView);
-        if (mMovie.response != null){
-            if (mMovie.response.Poster != null) {
+        ImageButton playButton = (ImageButton)  mTheaterAdapter.mHeaderView.findViewById(R.id.play_button);
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mMovie.trailer != null) {
+                    Intent youtubeIntent = YouTubeIntents.createPlayVideoIntent(getActivity().getApplicationContext(), mMovie.youtubeID());
+                    startActivity(youtubeIntent);
+                }
+            }
+        };
+        mHeroImage.setOnClickListener(clickListener);
+        playButton.setOnClickListener(clickListener);
+
+        if (mMovie.trailer != null){
+            if (mMovie.response != null) {
                 Picasso.with(getActivity()).setLoggingEnabled(true);
-                Picasso.with(getActivity()).load(mMovie.response.largePoster()).into(mHeroImage);
+                Picasso.with(getActivity()).load(mMovie.response.posterURLForDensity(getActivity().getApplicationContext())).into(mHeroImage);
             }
         }
     }
@@ -143,10 +169,10 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
             mTheater = theater;
             if (itemView.getClass().equals(LinearLayout.class)){
                 TextView titleTextView = (TextView) itemView.findViewById(R.id.list_item_theater_textview);
-                TextView showtimesTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
+                TextView showtimeTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
 
                 titleTextView.setText(mTheater.name);
-                showtimesTextView.setText(mTheater.showtimesString());
+                showtimeTextView.setText(mTheater.showtimesString());
             }
         }
 

@@ -2,6 +2,8 @@ package com.truman.showtime.showtime;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by ctruman on 1/28/15.
@@ -22,6 +24,19 @@ public class Movie implements Serializable {
     List<Theater> theaters;
     OMDBAPIResponse response;
 
+    public String youtubePreviewImageURL(){
+        return "https://i.ytimg.com/vi/" + youtubeID() + "/hqdefault.jpg";
+    }
+
+    public String youtubeID() {
+        String vId = null;
+        Pattern pattern = Pattern.compile(".*(?:youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=)([^#\\&\\?]*).*");
+        Matcher matcher = pattern.matcher(trailer);
+        if (matcher.matches()){
+            vId = matcher.group(1);
+        }
+        return vId;
+    }
     public String imdbID() {
         return imdb.replaceFirst(".*/([^/?]+).*", "$1");
     }

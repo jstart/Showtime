@@ -254,23 +254,14 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
     @Override
     public void onScrollChanged(int i, boolean b, boolean b2) {
-
     }
 
     @Override
     public void onDownMotionEvent() {
-
     }
 
     @Override
     public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-        final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
-        actionBar.setShowHideAnimationEnabled(true);
-        if (scrollState == ScrollState.DOWN){
-            actionBar.show();
-        } else if (scrollState == ScrollState.UP){
-            actionBar.show();
-        }
     }
 
     private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {

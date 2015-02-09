@@ -17,14 +17,11 @@ public class MainActivity extends ActionBarActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState == null) {
-
             setContentView(R.layout.activity_main);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             if (toolbar != null) {
                 setSupportActionBar(toolbar);
             }
-
             mDemoCollectionPagerAdapter =
                     new ShowtimePagerAdapter(
                             getSupportFragmentManager());
@@ -48,7 +45,6 @@ public class MainActivity extends ActionBarActivity {
             mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
                 }
 
                 @Override
@@ -58,11 +54,8 @@ public class MainActivity extends ActionBarActivity {
 
                 @Override
                 public void onPageScrollStateChanged(int state) {
-
                 }
-
             });
-        }
     }
 
     public class ShowtimePagerAdapter extends FragmentStatePagerAdapter {
@@ -90,9 +83,9 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             if (position == 1){
-                return "Movies";
+                return getString(R.string.movies_tab_title);
             }else {
-                return "Theaters";
+                return getString(R.string.theaters_tab_title);
             }
         }
     }

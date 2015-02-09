@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,14 +11,15 @@
     android:weightSum="1"
     android:background="?android:selectableItemBackground"
     android:orientation="vertical">
-
     <TextView
         android:layout_width="fill_parent"
-        android:layout_height="23dp"
-        android:minHeight="?android:attr/listPreferredItemHeight"
+        android:layout_height="wrap_content"
+        android:minHeight="0dp"
         android:gravity="center_vertical"
         android:id="@+id/list_item_theater_textview"
         android:textSize="@dimen/abc_text_size_medium_material"
+        android:minLines="1"
+        android:maxLines="2"
         android:textColor="@color/primary_text_default_material_light"
         android:text="AMC South Bay Galleria 16"
         android:ellipsize="marquee" />
@@ -34,7 +34,6 @@
         android:maxLines="3"
         android:minLines="0"
         android:maxHeight="80dp"
-        android:autoText="false"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp" />
 </LinearLayout>

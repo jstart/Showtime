@@ -108,7 +108,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
         mRefreshLayout.post(new Runnable() {
             @Override public void run() {
                 mRefreshLayout.setRefreshing(true);
@@ -133,15 +132,12 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         }
     }
 
-
     @Override
     public void onScrollChanged(int i, boolean b, boolean b2) {
-
     }
 
     @Override
     public void onDownMotionEvent() {
-
     }
 
     @Override
@@ -210,7 +206,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                         mRefreshLayout.setRefreshing(false);
                     }
                 });
-                Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -241,7 +237,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity().getApplicationContext(), getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
         mRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -326,12 +322,12 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 mShowtimeService = ShowtimeService.adapter();
                 movies = mShowtimeService.listMovies(lat, lon, date, city);
 //                Movie movie = mShowtimeService.movieDetails("ddf88042ef931de1", lat, lon, date, city);
-                for (int i = 0; i < movies.size(); i++){
-                    Movie movie = movies.get(i);
-                    if (!movie.imdbID().equalsIgnoreCase("false")){
-                        movie.response = ShowtimeService.omdbAdapter().getResponse(movie.imdbID(), "json");
-                    }
-                }
+//                for (int i = 0; i < movies.size(); i++){
+//                    Movie movie = movies.get(i);
+//                    if (!movie.imdbID().equalsIgnoreCase("false")){
+//                        movie.response = ShowtimeService.omdbAdapter().getResponse(movie.imdbID(), "json");
+//                    }
+//                }
             }
 
             return movies;
@@ -376,7 +372,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 mRefreshLayout.setRefreshing(false);
             } else {
                 mRefreshLayout.setRefreshing(false);
-                Toast.makeText(getActivity().getApplicationContext(), "No Movies found", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.no_movies_found), Toast.LENGTH_LONG).show();
             }
         }
     }
