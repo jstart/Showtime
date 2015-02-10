@@ -15,5 +15,8 @@
     <string name="showtimes_nearby_title">Showtimes nearby</string>
     <string name="movie_details_error">Movie details not found</string>
     <string name="theaters_not_found">No theaters found</string>
+    <string name="share_showtimes">Share showtimes</string>
+    <string name="buy_tickets">Buy tickets</string>
+    <string name="directions_theater">Directions to theater</string>
 
 </resources>

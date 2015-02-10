@@ -12,11 +12,15 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.Time;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -37,6 +41,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 
@@ -55,6 +61,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     private LinearLayout mDetailsLayout;
     private ProgressBar mProgressBar;
     private ShowtimeService.Showtimes mShowtimeService;
+    private Theater mSelectedTheater;
 
     String mLat;
     String mLon;
@@ -135,11 +142,11 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
 
         mHeroImage = (ImageView)  mTheaterAdapter.mHeaderView.findViewById(R.id.imageView);
         ImageButton playButton = (ImageButton)  mTheaterAdapter.mHeaderView.findViewById(R.id.play_button);
-        View.OnClickListener clickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mMovie.trailer != null) {
-                    if (YouTubeIntents.canResolvePlayVideoIntent(getActivity().getApplicationContext())){
+        if (mMovie.trailer != null) {
+            View.OnClickListener clickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (YouTubeIntents.canResolvePlayVideoIntent(getActivity().getApplicationContext())) {
                         Intent youtubeIntent = YouTubeIntents.createPlayVideoIntent(getActivity().getApplicationContext(), mMovie.youtubeID());
                         startActivity(youtubeIntent);
                     } else {
@@ -148,16 +155,55 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                         startActivity(i);
                     }
                 }
-            }
-        };
-        mHeroImage.setOnClickListener(clickListener);
-        playButton.setOnClickListener(clickListener);
+            };
+            mHeroImage.setOnClickListener(clickListener);
+            playButton.setOnClickListener(clickListener);
+        } else {
+            playButton.setVisibility(View.INVISIBLE);
+        }
 
         if (mMovie.poster != null) {
             Picasso.with(getActivity()).setLoggingEnabled(true);
             Picasso.with(getActivity()).load(mMovie.posterURLForDensity(getActivity().getApplicationContext())).into(mHeroImage);
         }
     }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.showtimes_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterViewCompat.AdapterContextMenuInfo info = (AdapterViewCompat.AdapterContextMenuInfo) item.getMenuInfo();
+        // Handle context actions
+        if (item.getTitle().equals(getString(R.string.directions_theater))){
+            // Create a Uri from an intent string. Use the result to create an Intent.
+            String theaterString = null;
+            try {
+                theaterString = URLEncoder.encode(mSelectedTheater.address, "UTF-8");
+                Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + theaterString);
+                // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                // Make the Intent explicit by setting the Google Maps package
+//                mapIntent.setPackage("com.google.android.apps.maps");
+                // Attempt to start an activity that can handle the Intent
+                if (mapIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(mapIntent);
+                }
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        } else if (item.getTitle().equals(R.string.share_showtimes)){
+
+        } else if (item.getTitle().equals(R.string.buy_tickets)){
+
+        }
+        return super.onContextItemSelected(item);
+    }
+
 
     @Override
     public void onScrollChanged(int i, boolean b, boolean b2) {
@@ -211,15 +257,14 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
 
         @Override
         public void onClick(View v) {
-//            Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
-//            detailIntent.putExtra("Type", "Theater");
-//            detailIntent.putExtra("TheaterDetails", mTheater);
-//            startActivity(detailIntent);
+            mSelectedTheater = mTheater;
+            getActivity().openContextMenu(v);
         }
 
         @Override
         public boolean onLongClick(View v) {
-//            getActivity().openContextMenu(v);
+            mSelectedTheater = mTheater;
+            getActivity().openContextMenu(v);
             return true;
         }
     }
@@ -280,7 +325,6 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
             } catch (ClassNotFoundException e) {
 //                e.printStackTrace();
                 Log.d("Showtime", "movies class not found miss");
-
             }
 
             if (movie == null) {

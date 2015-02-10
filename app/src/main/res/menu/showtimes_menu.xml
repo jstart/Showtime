@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/share"
+        android:title="@string/share_showtimes" />
+    <item android:id="@+id/buy_tickets"
+        android:title="@string/buy_tickets" />
+    <item android:id="@+id/directions"
+        android:title="@string/directions_theater" />
+</menu>
