@@ -390,7 +390,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             File file = new File(getActivity().getCacheDir(), cacheKey);
             List<Theater> theaters = null;
             if (file.exists()) {
-                FileInputStream fis = getActivity().getApplicationContext().openFileInput(cacheKey);
+                FileInputStream fis = new FileInputStream(file);
                 ObjectInputStream is = new ObjectInputStream(fis);
                 theaters = (List<Theater>) is.readObject();
                 is.close();

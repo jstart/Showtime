@@ -9,14 +9,20 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
+
 
 public class MainActivity extends ActionBarActivity {
     private ShowtimePagerAdapter mDemoCollectionPagerAdapter;
     private ViewPager mViewPager;
     private SlidingTabLayout mSlidingTabLayout;
+    private MixpanelAPI mMixpanel;
+    public static final String MIXPANEL_TOKEN = "a6131725e7cc0ba03dd1bb423f9ba65a";
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+            mMixpanel =
+                        MixpanelAPI.getInstance(getApplicationContext(), MIXPANEL_TOKEN);
             setContentView(R.layout.activity_main);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             if (toolbar != null) {
@@ -56,6 +62,11 @@ public class MainActivity extends ActionBarActivity {
                 public void onPageScrollStateChanged(int state) {
                 }
             });
+    }
+
+    protected void onDestroy() {
+        mMixpanel.flush();
+        super.onDestroy();
     }
 
     public class ShowtimePagerAdapter extends FragmentStatePagerAdapter {
