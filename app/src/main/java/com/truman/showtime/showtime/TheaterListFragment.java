@@ -15,7 +15,6 @@
  */
 package com.truman.showtime.showtime;
 
-import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -50,6 +49,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -72,6 +72,8 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     private ShowtimeService.Showtimes mShowtimeService;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
+    private Address mAddress;
+    private String mCity;
 
     public TheaterListFragment() {
     }
@@ -164,15 +166,17 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
-            ShowtimeApiManager api = new ShowtimeApiManager();
+            ShowtimeAPITask api = new ShowtimeAPITask();
             String lat = String.valueOf(mLastLocation.getLatitude());
             String lon = String.valueOf(mLastLocation.getLongitude());
             Geocoder geocoder = new Geocoder(getActivity().getApplicationContext(), Locale.getDefault());
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+                mAddress = addresses.get(0);
                 final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
                 actionBar.setSubtitle("near " + addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
+                mCity = URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8");
                 api.execute(lat, lon, "0", URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8"));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -181,7 +185,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             if (Build.MODEL.contains("google_sdk") ||
                     Build.MODEL.contains("Emulator") ||
                     Build.MODEL.contains("Android SDK")) {
-                ShowtimeApiManager api = new ShowtimeApiManager();
+                ShowtimeAPITask api = new ShowtimeAPITask();
                 api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
             } else {
                 LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
@@ -191,7 +195,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                         mRefreshLayout.setRefreshing(false);
                     }
                 });
-                Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -242,7 +246,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 Build.MODEL.contains("Android SDK")) {
             refreshWithLocation();
         } else {
-            Toast.makeText(getActivity().getApplicationContext(), "Location Services Disabled", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
             mRefreshLayout.post(new Runnable() {
                 @Override
                 public void run() {
@@ -288,6 +292,12 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
             detailIntent.putExtra("Type", "Theater");
             detailIntent.putExtra("TheaterDetails", mTheater);
+
+            detailIntent.putExtra("Lat", String.valueOf(mLastLocation.getLatitude()));
+            detailIntent.putExtra("Lon", String.valueOf(mLastLocation.getLongitude()));
+            detailIntent.putExtra("Address", mAddress);
+            detailIntent.putExtra("City", mCity);
+
             startActivity(detailIntent);
         }
 
@@ -320,20 +330,25 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         }
     }
 
-    public class ShowtimeApiManager extends AsyncTask<String, String, List<Theater>> {
+    public class ShowtimeAPITask extends AsyncTask<String, String, List<Theater>> {
         String mCacheKey;
         protected List<Theater> getResponse(String lat, String lon, String date, String city) {
             Time today = new Time(Time.getCurrentTimezone());
             today.setToNow();
-            mCacheKey = "theaters:city:" + city + ":date:" + today.month + today.monthDay + today.year;
+            mCacheKey = "theaters_city_" + city + "_date_" + today.month + today.monthDay + today.year;
             String result = null;
             List<Theater> theaters = null;
+            Log.d("Showtime", mCacheKey);
             try {
                 theaters = cachedResultsForKey(mCacheKey);
+                Log.d("Showtime", "theaters Cache hit");
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                Log.d("Showtime", "theaters ioexception miss");
+
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                Log.d("Showtime", "theaters class not found miss");
             }
 
             if (theaters == null) {
@@ -353,6 +368,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         protected void onPostExecute(List<Theater> results) {
             mTheaterResults = results;
             try {
+                Log.d("Showtime", mCacheKey);
                 cacheResults(results);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -361,7 +377,8 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         }
 
         public void cacheResults(List<Theater> results) throws IOException {
-            FileOutputStream fos = getActivity().getApplicationContext().openFileOutput(mCacheKey, Context.MODE_PRIVATE);
+            File file = new File(getActivity().getCacheDir(), mCacheKey);
+            FileOutputStream fos = new FileOutputStream(file);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(results);
             os.close();
@@ -369,11 +386,15 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         }
 
         public List<Theater> cachedResultsForKey(String cacheKey) throws IOException, ClassNotFoundException {
-            FileInputStream fis = getActivity().getApplicationContext().openFileInput(cacheKey);
-            ObjectInputStream is = new ObjectInputStream(fis);
-            List<Theater> theaters = (List<Theater>) is.readObject();
-            is.close();
-            fis.close();
+            File file = new File(getActivity().getCacheDir(), cacheKey);
+            List<Theater> theaters = null;
+            if (file.exists()) {
+                FileInputStream fis = getActivity().getApplicationContext().openFileInput(cacheKey);
+                ObjectInputStream is = new ObjectInputStream(fis);
+                theaters = (List<Theater>) is.readObject();
+                is.close();
+                fis.close();
+            }
             return theaters;
         }
 
@@ -383,7 +404,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 mRefreshLayout.setRefreshing(false);
             } else {
                 mRefreshLayout.setRefreshing(false);
-                Toast.makeText(getActivity().getApplicationContext(), "No theaters found", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.theaters_not_found), Toast.LENGTH_LONG).show();
             }
         }
     }

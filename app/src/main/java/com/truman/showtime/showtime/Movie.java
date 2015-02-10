@@ -1,5 +1,7 @@
 package com.truman.showtime.showtime;
 
+import android.content.Context;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -19,6 +21,7 @@ public class Movie implements Serializable {
     String trailer;
     List<String> showtimes;
 
+    String poster;
     String director;
     String description;
     List<Theater> theaters;
@@ -52,5 +55,42 @@ public class Movie implements Serializable {
             }
         }
         return showtimesList;
+    }
+
+    private static String getDensityName(Context context) {
+        float density = context.getResources().getDisplayMetrics().density;
+        if (density >= 4.0) {
+            return "xxxhdpi";
+        }
+        if (density >= 3.0) {
+            return "xxhdpi";
+        }
+        if (density >= 2.0) {
+            return "xhdpi";
+        }
+        if (density >= 1.5) {
+            return "hdpi";
+        }
+        if (density >= 1.0) {
+            return "mdpi";
+        }
+        return "ldpi";
+    }
+    String posterURLForDensity(Context context){
+        switch (getDensityName(context)) {
+            case "ldpi":
+                return poster;
+            case "mdpi":
+                return poster.replace("214_AL_.jpg", "6000.jpg");
+            case "hdpi":
+                return poster.replace("214_AL_.jpg", "800.jpg");
+            case "xhdpi":
+                return poster.replace("214_AL_.jpg", "1000.jpg");
+            case "xxhdpi":
+                return poster.replace("214_AL_.jpg", "1500.jpg");
+            case "xxxhdpi":
+                return poster.replace("214_AL_.jpg", "2000.jpg");
+        }
+        return poster;
     }
 }

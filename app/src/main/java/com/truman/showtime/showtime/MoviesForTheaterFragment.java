@@ -1,6 +1,7 @@
 package com.truman.showtime.showtime;
 
 import android.content.Intent;
+import android.location.Address;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -19,13 +20,17 @@ import java.util.List;
  * Created by ctruman on 1/21/15.
  */
 public class MoviesForTheaterFragment extends android.support.v4.app.Fragment {
-        MovieAdapter mMovieAdapter;
-        ArrayList<Movie> mMovieResults;
-        RecyclerView mRecyclerView;
-        LinearLayoutManager mLayoutManager;
-        SwipeRefreshLayout mRefreshLayout;
+    MovieAdapter mMovieAdapter;
+    ArrayList<Movie> mMovieResults;
+    RecyclerView mRecyclerView;
+    LinearLayoutManager mLayoutManager;
+    SwipeRefreshLayout mRefreshLayout;
+    String mLat;
+    String mLon;
+    String mCity;
+    Address mAddress;
 
-        public MoviesForTheaterFragment() {
+    public MoviesForTheaterFragment() {
         }
 
         @Override
@@ -80,6 +85,12 @@ public class MoviesForTheaterFragment extends android.support.v4.app.Fragment {
                 Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
                 detailIntent.putExtra("MovieDetails", mMovie);
                 detailIntent.putExtra("Type", "Movie");
+
+                detailIntent.putExtra("Lat", mLat);
+                detailIntent.putExtra("Lon", mLon);
+                detailIntent.putExtra("Address", mAddress);
+                detailIntent.putExtra("City", mCity);
+
                 startActivity(detailIntent);
             }
         }

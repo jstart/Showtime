@@ -13,5 +13,7 @@
     <string name="location_services_disabled">Location Services Disabled</string>
     <string name="no_movies_found">No Movies found</string>
     <string name="showtimes_nearby_title">Showtimes nearby</string>
+    <string name="movie_details_error">Movie details not found</string>
+    <string name="theaters_not_found">No theaters found</string>
 
 </resources>

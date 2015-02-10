@@ -15,7 +15,6 @@
  */
 package com.truman.showtime.showtime;
 
-import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -31,6 +30,7 @@ import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -49,6 +49,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -70,6 +71,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     ShowtimeService.Showtimes mShowtimeService;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
+    private Address mAddress;
+    private String mCity;
 
     public MovieListFragment() {
     }
@@ -188,6 +191,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+                mAddress = addresses.get(0);
+                mCity = URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8");
                 api.execute(lat, lon, "0", URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8"));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -271,6 +276,12 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
             detailIntent.putExtra("Type", "Movie");
             detailIntent.putExtra("MovieDetails", mMovie);
+
+            detailIntent.putExtra("Lat", String.valueOf(mLastLocation.getLatitude()));
+            detailIntent.putExtra("Lon", String.valueOf(mLastLocation.getLongitude()));
+            detailIntent.putExtra("Address", mAddress);
+            detailIntent.putExtra("City", mCity);
+
             startActivity(detailIntent);
         }
 
@@ -307,11 +318,13 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         protected List<Movie> getResponse(String lat, String lon, String date, String city) {
             Time today = new Time(Time.getCurrentTimezone());
             today.setToNow();
-            mCacheKey = "movies:city:" + city + ":date:" + today.month + today.monthDay + today.year;
+            mCacheKey = "movies_city_" + city + "_date_" + today.month + today.monthDay + today.year;
             String result = null;
             List<Movie> movies = null;
+            Log.d("Showtime", mCacheKey);
             try {
                 movies = cachedResultsForKey(mCacheKey);
+                Log.d("Showtime", "Movies Cache hit");
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -321,13 +334,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             if (movies == null) {
                 mShowtimeService = ShowtimeService.adapter();
                 movies = mShowtimeService.listMovies(lat, lon, date, city);
-//                Movie movie = mShowtimeService.movieDetails("ddf88042ef931de1", lat, lon, date, city);
-//                for (int i = 0; i < movies.size(); i++){
-//                    Movie movie = movies.get(i);
-//                    if (!movie.imdbID().equalsIgnoreCase("false")){
-//                        movie.response = ShowtimeService.omdbAdapter().getResponse(movie.imdbID(), "json");
-//                    }
-//                }
             }
 
             return movies;
@@ -350,7 +356,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         }
 
         public void cacheResults(List<Movie> results) throws IOException {
-            FileOutputStream fos = getActivity().getApplicationContext().openFileOutput(mCacheKey, Context.MODE_PRIVATE);
+            List<Movie> movies = null;
+            FileOutputStream fos = new FileOutputStream(mCacheKey);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(results);
             os.close();
@@ -358,12 +365,17 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         }
 
         public List<Movie> cachedResultsForKey(String cacheKey) throws IOException, ClassNotFoundException {
-            FileInputStream fis = getActivity().getApplicationContext().openFileInput(cacheKey);
-            ObjectInputStream is = new ObjectInputStream(fis);
-            List<Movie> Movies = (List<Movie>) is.readObject();
-            is.close();
-            fis.close();
-            return Movies;
+            File file = new File(getActivity().getCacheDir(), cacheKey);
+            List<Movie> movies = null;
+            if (file.exists()){
+                FileInputStream fis = getActivity().getApplicationContext().openFileInput(cacheKey);
+                ObjectInputStream is = new ObjectInputStream(fis);
+                movies = (List<Movie>) is.readObject();
+                is.close();
+                fis.close();
+            }
+
+            return movies;
         }
 
         public void parseAndReloadResults(List<Movie> result){
