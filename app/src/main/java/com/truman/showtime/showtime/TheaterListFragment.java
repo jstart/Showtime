@@ -102,10 +102,10 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
         buildGoogleApiClient();
         mGoogleApiClient.connect();
-        mLocationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_NO_POWER)
-                .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
-                .setFastestInterval(100 * 1000); // 100 second, in milliseconds
+//        mLocationRequest = LocationRequest.create()
+//                .setPriority(LocationRequest.PRIORITY_NO_POWER)
+//                .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
+//                .setFastestInterval(100 * 1000); // 100 second, in milliseconds
 
         return rootView;
     }
@@ -146,7 +146,9 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        refreshWithLocation();
+        if (!mRefreshLayout.isRefreshing()){
+            refreshWithLocation();
+        }
     }
 
     public void refreshWithLocation() {
@@ -368,7 +370,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         protected void onPostExecute(List<Theater> results) {
             mTheaterResults = results;
             try {
-                Log.d("Showtime", mCacheKey);
                 cacheResults(results);
             } catch (IOException e) {
                 e.printStackTrace();

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -138,8 +139,14 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
             @Override
             public void onClick(View v) {
                 if (mMovie.trailer != null) {
-                    Intent youtubeIntent = YouTubeIntents.createPlayVideoIntent(getActivity().getApplicationContext(), mMovie.youtubeID());
-                    startActivity(youtubeIntent);
+                    if (YouTubeIntents.canResolvePlayVideoIntent(getActivity().getApplicationContext())){
+                        Intent youtubeIntent = YouTubeIntents.createPlayVideoIntent(getActivity().getApplicationContext(), mMovie.youtubeID());
+                        startActivity(youtubeIntent);
+                    } else {
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(mMovie.trailer));
+                        startActivity(i);
+                    }
                 }
             }
         };
