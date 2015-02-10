@@ -326,9 +326,12 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 movies = cachedResultsForKey(mCacheKey);
                 Log.d("Showtime", "Movies Cache hit");
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                Log.d("Showtime", "movies ioexception miss");
+
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                Log.d("Showtime", "movies class not found miss");
             }
 
             if (movies == null) {
@@ -368,7 +371,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             File file = new File(getActivity().getCacheDir(), cacheKey);
             List<Movie> movies = null;
             if (file.exists()){
-                FileInputStream fis = getActivity().getApplicationContext().openFileInput(cacheKey);
+                FileInputStream fis = new FileInputStream(file);
                 ObjectInputStream is = new ObjectInputStream(fis);
                 movies = (List<Movie>) is.readObject();
                 is.close();
