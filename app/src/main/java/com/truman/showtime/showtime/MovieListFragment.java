@@ -360,7 +360,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         public void cacheResults(List<Movie> results) throws IOException {
             List<Movie> movies = null;
-            FileOutputStream fos = new FileOutputStream(mCacheKey);
+            File file = new File(getActivity().getCacheDir(), mCacheKey);
+            FileOutputStream fos = new FileOutputStream(file);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(results);
             os.close();
