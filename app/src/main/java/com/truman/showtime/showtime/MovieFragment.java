@@ -188,7 +188,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                 // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                 // Make the Intent explicit by setting the Google Maps package
-//                mapIntent.setPackage("com.google.android.apps.maps");
+                mapIntent.setPackage("com.google.android.apps.maps");
                 // Attempt to start an activity that can handle the Intent
                 if (mapIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                     startActivity(mapIntent);
@@ -257,15 +257,20 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
 
         @Override
         public void onClick(View v) {
-            mSelectedTheater = mTheater;
-            getActivity().openContextMenu(v);
+            if (mTheater != null) {
+                mSelectedTheater = mTheater;
+                getActivity().openContextMenu(v);
+            }
         }
 
         @Override
         public boolean onLongClick(View v) {
-            mSelectedTheater = mTheater;
-            getActivity().openContextMenu(v);
-            return true;
+            if (mTheater != null) {
+                mSelectedTheater = mTheater;
+                getActivity().openContextMenu(v);
+                return true;
+            }
+            return false;
         }
     }
 
@@ -275,7 +280,6 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
 
         @Override
         public TheaterHolder onCreateViewHolder(ViewGroup parent, int pos) {
-
             if (pos == HEADER) {
                 return new TheaterHolder(mHeaderView);
             }
