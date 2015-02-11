@@ -55,7 +55,7 @@
         <View
             android:id="@+id/top_separator"
             android:layout_width="match_parent"
-            android:layout_height="1dip"
+            android:layout_height="1dp"
             android:background="#b1858585" />
         <ProgressBar
             android:id="@+id/progress_bar"

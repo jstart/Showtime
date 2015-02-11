@@ -237,40 +237,35 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         private Theater mTheater;
 
-        public TheaterHolder(View itemView) {
+        public TheaterHolder(View itemView, int pos) {
             super(itemView);
-            itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
-            registerForContextMenu(itemView);
+            if (pos != HEADER) {
+                itemView.setOnClickListener(this);
+                itemView.setOnLongClickListener(this);
+                registerForContextMenu(itemView);
+            }
         }
 
         public void bindTheater(Theater theater) {
             mTheater = theater;
-            if (itemView.getClass().equals(LinearLayout.class)){
-                TextView titleTextView = (TextView) itemView.findViewById(R.id.list_item_theater_textview);
-                TextView showtimeTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
+            TextView titleTextView = (TextView) itemView.findViewById(R.id.list_item_theater_textview);
+            TextView showtimeTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
 
-                titleTextView.setText(mTheater.name);
-                showtimeTextView.setText(mTheater.showtimesString());
-            }
+            titleTextView.setText(mTheater.name);
+            showtimeTextView.setText(mTheater.showtimesString());
         }
 
         @Override
         public void onClick(View v) {
-            if (mTheater != null) {
-                mSelectedTheater = mTheater;
-                getActivity().openContextMenu(v);
-            }
+            mSelectedTheater = mTheater;
+            getActivity().openContextMenu(v);
         }
 
         @Override
         public boolean onLongClick(View v) {
-            if (mTheater != null) {
-                mSelectedTheater = mTheater;
-                getActivity().openContextMenu(v);
-                return true;
-            }
-            return false;
+            mSelectedTheater = mTheater;
+            getActivity().openContextMenu(v);
+            return true;
         }
     }
 
@@ -281,12 +276,12 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         @Override
         public TheaterHolder onCreateViewHolder(ViewGroup parent, int pos) {
             if (pos == HEADER) {
-                return new TheaterHolder(mHeaderView);
+                return new TheaterHolder(mHeaderView, pos);
             }
             else {
                 View view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.list_item_layout, parent, false);
-                return new TheaterHolder(view);
+                return new TheaterHolder(view, pos);
             }
         }
 
