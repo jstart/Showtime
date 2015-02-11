@@ -220,7 +220,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.movie_menu, menu);
+//        inflater.inflate(R.menu.movie_menu, menu);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.truman.showtime.showtime;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import retrofit.RestAdapter;
 import retrofit.http.GET;
@@ -13,7 +13,7 @@ public class ShowtimeService {
 
     interface Showtimes {
         @GET("/showtimes")
-        List<Theater> listTheaters(
+        ArrayList<Theater> listTheaters(
                 @Query("lat") String lat,
                 @Query("lon") String lon,
                 @Query("date") String date,
@@ -21,7 +21,7 @@ public class ShowtimeService {
         );
 
         @GET("/movies")
-        List<Movie> listMovies(
+        ArrayList<Movie> listMovies(
                 @Query("lat") String lat,
                 @Query("lon") String lon,
                 @Query("date") String date,

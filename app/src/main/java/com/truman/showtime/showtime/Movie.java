@@ -25,7 +25,6 @@ public class Movie implements Serializable {
     String director;
     String description;
     List<Theater> theaters;
-    OMDBAPIResponse response;
 
     public String youtubePreviewImageURL(){
         return "https://i.ytimg.com/vi/" + youtubeID() + "/hqdefault.jpg";

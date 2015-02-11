@@ -62,7 +62,7 @@ import java.util.Locale;
 
 public class TheaterListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ObservableScrollViewCallbacks {
     private TheaterAdapter mTheaterAdapter;
-    private List<Theater> mTheaterResults;
+    private ArrayList<Theater> mTheaterResults;
     private String mContextTheaterAddress;
 
     private SwipeRefreshLayout mRefreshLayout;
@@ -74,6 +74,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     private LocationRequest mLocationRequest;
     private Address mAddress;
     private String mCity;
+    private Boolean hasConnected = false;
 
     public TheaterListFragment() {
     }
@@ -146,7 +147,8 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        if (!mRefreshLayout.isRefreshing()){
+        if (!hasConnected){
+            hasConnected = true;
             refreshWithLocation();
         }
     }
@@ -171,13 +173,14 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             ShowtimeAPITask api = new ShowtimeAPITask();
             String lat = String.valueOf(mLastLocation.getLatitude());
             String lon = String.valueOf(mLastLocation.getLongitude());
+            // TODO: fix getcontext crash
             Geocoder geocoder = new Geocoder(getActivity().getApplicationContext(), Locale.getDefault());
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
                 mAddress = addresses.get(0);
                 final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
-                actionBar.setSubtitle("near " + addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
+//                actionBar.setSubtitle("near " + addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
                 mCity = URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8");
                 api.execute(lat, lon, "0", URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8"));
             } catch (IOException e) {
@@ -332,14 +335,14 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         }
     }
 
-    public class ShowtimeAPITask extends AsyncTask<String, String, List<Theater>> {
+    public class ShowtimeAPITask extends AsyncTask<String, String, ArrayList<Theater>> {
         String mCacheKey;
-        protected List<Theater> getResponse(String lat, String lon, String date, String city) {
+        protected ArrayList<Theater> getResponse(String lat, String lon, String date, String city) {
             Time today = new Time(Time.getCurrentTimezone());
             today.setToNow();
             mCacheKey = "theaters_city_" + city + "_date_" + today.month + today.monthDay + today.year;
             String result = null;
-            List<Theater> theaters = null;
+            ArrayList<Theater> theaters = null;
             Log.d("Showtime", mCacheKey);
             try {
                 theaters = cachedResultsForKey(mCacheKey);
@@ -362,12 +365,12 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         }
 
         @Override
-        protected List<Theater> doInBackground(String... arg0) {
+        protected ArrayList<Theater> doInBackground(String... arg0) {
             return getResponse(arg0[0], arg0[1], arg0[2], arg0[3]);
         }
 
         @Override
-        protected void onPostExecute(List<Theater> results) {
+        protected void onPostExecute(ArrayList<Theater> results) {
             mTheaterResults = results;
             try {
                 cacheResults(results);
@@ -377,7 +380,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             parseAndReloadResults(results);
         }
 
-        public void cacheResults(List<Theater> results) throws IOException {
+        public void cacheResults(ArrayList<Theater> results) throws IOException {
             File file = new File(getActivity().getCacheDir(), mCacheKey);
             FileOutputStream fos = new FileOutputStream(file);
             ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -386,20 +389,20 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             fos.close();
         }
 
-        public List<Theater> cachedResultsForKey(String cacheKey) throws IOException, ClassNotFoundException {
+        public ArrayList<Theater> cachedResultsForKey(String cacheKey) throws IOException, ClassNotFoundException {
             File file = new File(getActivity().getCacheDir(), cacheKey);
-            List<Theater> theaters = null;
+            ArrayList<Theater> theaters = null;
             if (file.exists()) {
                 FileInputStream fis = new FileInputStream(file);
                 ObjectInputStream is = new ObjectInputStream(fis);
-                theaters = (List<Theater>) is.readObject();
+                theaters = (ArrayList<Theater>) is.readObject();
                 is.close();
                 fis.close();
             }
             return theaters;
         }
 
-        public void parseAndReloadResults(List<Theater> result){
+        public void parseAndReloadResults(ArrayList<Theater> result){
             if (result.size() > 0){
                 mTheaterAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);

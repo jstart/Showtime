@@ -2,8 +2,6 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="@style/Theme.AppCompat.Light">
-        <item name="actionBarStyle">@style/ShowtimeActionBar</item>
-        <item name="android:actionBarStyle">@style/ShowtimeActionBar</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowActionBar">false</item>
         <item name="colorPrimary">@color/primary</item>
@@ -15,7 +13,11 @@
         <item name="android:textColor">@color/text_secondary</item>
     </style>
     <style name="ShowtimeActionBar">
-        <item name="android:background">@color/primary</item>
-        <item name="background">@color/primary</item>
+        <item name="android:subtitleTextStyle">@style/SubtitleTextStyle</item>
+        <item name="subtitleTextStyle">@style/SubtitleTextStyle</item>
+    </style>
+    <style name="SubtitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">@dimen/abc_text_size_small_material</item>
     </style>
 </resources>

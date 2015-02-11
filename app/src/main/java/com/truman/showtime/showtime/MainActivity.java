@@ -33,11 +33,6 @@ public class MainActivity extends ActionBarActivity {
                             getSupportFragmentManager());
             mViewPager = (ViewPager) findViewById(R.id.pager);
             mViewPager.setAdapter(mDemoCollectionPagerAdapter);
-            if (savedInstanceState == null) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.container, new TheaterListFragment())
-                        .commit();
-            }
             mViewPager.setOnPageChangeListener(
                     new ViewPager.SimpleOnPageChangeListener() {
                         @Override

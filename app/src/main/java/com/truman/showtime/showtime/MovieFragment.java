@@ -15,10 +15,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,7 +47,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -62,6 +63,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     private ProgressBar mProgressBar;
     private ShowtimeService.Showtimes mShowtimeService;
     private Theater mSelectedTheater;
+    private ShareActionProvider mShareActionProvider;
 
     String mLat;
     String mLon;
@@ -85,6 +87,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         if (mMovie.theaters == null){
             mMovie.theaters = new ArrayList<Theater>();
         }
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -169,6 +172,26 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate menu resource file.
+        inflater.inflate(R.menu.movie, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getTitle() == getString(R.string.share_showtimes)) {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, mMovie.name);
+            sendIntent.setType("text/plain");
+            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_showtimes)));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getActivity().getMenuInflater();
@@ -196,9 +219,13 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-        } else if (item.getTitle().equals(R.string.share_showtimes)){
-
-        } else if (item.getTitle().equals(R.string.buy_tickets)){
+        } else if (item.getTitle().equals(getString(R.string.share_showtimes))){
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, mMovie.name + "\n" + mSelectedTheater.name + "\n" + mSelectedTheater.address + "\n" + mSelectedTheater.showtimesString());
+            sendIntent.setType("text/plain");
+            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_showtimes)));
+        } else if (item.getTitle().equals(getString(R.string.buy_tickets))){
 
         }
         return super.onContextItemSelected(item);
