@@ -15,6 +15,7 @@
  */
 package com.truman.showtime.showtime;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -73,8 +74,15 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     private LocationRequest mLocationRequest;
     private Address mAddress;
     private String mCity;
+    private Context mApplicationContext;
 
     public MovieListFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mApplicationContext = getActivity().getApplicationContext();
     }
 
     @Override
@@ -94,7 +102,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         mRecyclerView = (ObservableRecyclerView) rootView.findViewById(R.id.listview);
         mRecyclerView.setScrollViewCallbacks(this);
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mApplicationContext));
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mMovieAdapter);
@@ -155,7 +163,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     }
 
     protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity().getApplicationContext())
+        mGoogleApiClient = new GoogleApiClient.Builder(mApplicationContext)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
@@ -187,7 +195,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             ShowtimeApiManager api = new ShowtimeApiManager();
             String lat = String.valueOf(mLastLocation.getLatitude());
             String lon = String.valueOf(mLastLocation.getLongitude());
-            Geocoder geocoder = new Geocoder(getActivity().getApplicationContext(), Locale.getDefault());
+            Geocoder geocoder = new Geocoder(mApplicationContext, Locale.getDefault());
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
@@ -211,7 +219,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                         mRefreshLayout.setRefreshing(false);
                     }
                 });
-                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
+                Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -242,7 +250,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(getActivity().getApplicationContext(), getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
+        Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
         mRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -388,7 +396,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 mRefreshLayout.setRefreshing(false);
             } else {
                 mRefreshLayout.setRefreshing(false);
-                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.no_movies_found), Toast.LENGTH_LONG).show();
+                Toast.makeText(mApplicationContext, getString(R.string.no_movies_found), Toast.LENGTH_LONG).show();
             }
         }
     }

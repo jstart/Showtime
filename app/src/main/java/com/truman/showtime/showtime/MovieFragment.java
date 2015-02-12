@@ -15,7 +15,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.ShareActionProvider;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -63,7 +62,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     private ProgressBar mProgressBar;
     private ShowtimeService.Showtimes mShowtimeService;
     private Theater mSelectedTheater;
-    private ShareActionProvider mShareActionProvider;
+    private Context mApplicationContext;
 
     String mLat;
     String mLon;
@@ -84,6 +83,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMovie = (Movie) getActivity().getIntent().getSerializableExtra("MovieDetails");
+        mApplicationContext = getActivity().getApplicationContext();
         if (mMovie.theaters == null){
             mMovie.theaters = new ArrayList<Theater>();
         }
@@ -104,7 +104,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         detailsView.setText("Genre: " + mMovie.genre + "\nRating: " + mMovie.rating + "\nRuntime: " + mMovie.runtime);
         mRecyclerView = (ObservableRecyclerView) rootView;
         mRecyclerView.setScrollViewCallbacks(this);
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mApplicationContext));
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mTheaterAdapter);
@@ -149,8 +149,8 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
             View.OnClickListener clickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (YouTubeIntents.canResolvePlayVideoIntent(getActivity().getApplicationContext())) {
-                        Intent youtubeIntent = YouTubeIntents.createPlayVideoIntent(getActivity().getApplicationContext(), mMovie.youtubeID());
+                    if (YouTubeIntents.canResolvePlayVideoIntent(mApplicationContext)) {
+                        Intent youtubeIntent = YouTubeIntents.createPlayVideoIntent(mApplicationContext, mMovie.youtubeID());
                         startActivity(youtubeIntent);
                     } else {
                         Intent i = new Intent(Intent.ACTION_VIEW);
@@ -378,7 +378,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         }
 
         public void cacheResults(Movie movie) throws IOException {
-            FileOutputStream fos = getActivity().getApplicationContext().openFileOutput(mCacheKey, Context.MODE_PRIVATE);
+            FileOutputStream fos = mApplicationContext.openFileOutput(mCacheKey, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(movie);
             os.close();
@@ -386,7 +386,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         }
 
         public Movie cachedResultsForKey(String cacheKey) throws IOException, ClassNotFoundException {
-            FileInputStream fis = getActivity().getApplicationContext().openFileInput(cacheKey);
+            FileInputStream fis = mApplicationContext.openFileInput(cacheKey);
             ObjectInputStream is = new ObjectInputStream(fis);
             Movie movie = (Movie) is.readObject();
             is.close();
@@ -407,15 +407,15 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                     mSeparatorView.setAlpha(1);
                     if (mMovie.poster != null) {
                         Picasso.with(getActivity()).setLoggingEnabled(true);
-                        Picasso.with(getActivity()).load(mMovie.posterURLForDensity(getActivity().getApplicationContext())).into(mHeroImage);
+                        Picasso.with(getActivity()).load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
                     }
                 } else {
                     ((LinearLayout)mProgressBar.getParent()).removeView(mProgressBar);
-                    Toast.makeText(getActivity().getApplicationContext(), getString(R.string.movie_details_error), Toast.LENGTH_LONG).show();
+                    Toast.makeText(mApplicationContext, getString(R.string.movie_details_error), Toast.LENGTH_LONG).show();
                 }
             } else {
                 ((LinearLayout)mProgressBar.getParent()).removeView(mProgressBar);
-                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.movie_details_error), Toast.LENGTH_LONG).show();
+                Toast.makeText(mApplicationContext, getString(R.string.movie_details_error), Toast.LENGTH_LONG).show();
             }
         }
     }

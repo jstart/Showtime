@@ -15,6 +15,7 @@
  */
 package com.truman.showtime.showtime;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -24,8 +25,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -74,9 +73,15 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     private LocationRequest mLocationRequest;
     private Address mAddress;
     private String mCity;
-    private Boolean hasConnected = false;
+    private Context mApplicationContext;
 
     public TheaterListFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mApplicationContext = getActivity().getApplicationContext();
     }
 
     @Override
@@ -96,7 +101,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
         mRecyclerView = (ObservableRecyclerView) rootView.findViewById(R.id.listview);
         mRecyclerView.setScrollViewCallbacks(this);
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity().getApplicationContext()));
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mApplicationContext));
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mTheaterAdapter);
@@ -138,7 +143,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     }
 
     protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity().getApplicationContext())
+        mGoogleApiClient = new GoogleApiClient.Builder(mApplicationContext)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
@@ -147,10 +152,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        if (!hasConnected){
-            hasConnected = true;
-            refreshWithLocation();
-        }
+        refreshWithLocation();
     }
 
     public void refreshWithLocation() {
@@ -173,13 +175,13 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             ShowtimeAPITask api = new ShowtimeAPITask();
             String lat = String.valueOf(mLastLocation.getLatitude());
             String lon = String.valueOf(mLastLocation.getLongitude());
-            // TODO: fix getcontext crash
-            Geocoder geocoder = new Geocoder(getActivity().getApplicationContext(), Locale.getDefault());
+
+            Geocoder geocoder = new Geocoder(mApplicationContext, Locale.getDefault());
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
                 mAddress = addresses.get(0);
-                final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
+//                final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
 //                actionBar.setSubtitle("near " + addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
                 mCity = URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8");
                 api.execute(lat, lon, "0", URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8"));
@@ -200,7 +202,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                         mRefreshLayout.setRefreshing(false);
                     }
                 });
-                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
+                Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -251,7 +253,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 Build.MODEL.contains("Android SDK")) {
             refreshWithLocation();
         } else {
-            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
+            Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
             mRefreshLayout.post(new Runnable() {
                 @Override
                 public void run() {
@@ -408,7 +410,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 mRefreshLayout.setRefreshing(false);
             } else {
                 mRefreshLayout.setRefreshing(false);
-                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.theaters_not_found), Toast.LENGTH_LONG).show();
+                Toast.makeText(mApplicationContext, getString(R.string.theaters_not_found), Toast.LENGTH_LONG).show();
             }
         }
     }
