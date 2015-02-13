@@ -287,10 +287,17 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
             detailIntent.putExtra("Type", "Movie");
             detailIntent.putExtra("MovieDetails", mMovie);
-
-            detailIntent.putExtra("Lat", String.valueOf(mLastLocation.getLatitude()));
-            detailIntent.putExtra("Lon", String.valueOf(mLastLocation.getLongitude()));
-            detailIntent.putExtra("City", mCity);
+            if (Build.MODEL.contains("google_sdk") ||
+                    Build.MODEL.contains("Emulator") ||
+                    Build.MODEL.contains("Android SDK")) {
+                detailIntent.putExtra("Lat", "33.8358");
+                detailIntent.putExtra("Lon", "-118.3406");
+                detailIntent.putExtra("City", "Torrance,+CA");
+            } else {
+                detailIntent.putExtra("Lat", String.valueOf(mLastLocation.getLatitude()));
+                detailIntent.putExtra("Lon", String.valueOf(mLastLocation.getLongitude()));
+                detailIntent.putExtra("City", mCity);
+            }
 
             startActivity(detailIntent);
         }

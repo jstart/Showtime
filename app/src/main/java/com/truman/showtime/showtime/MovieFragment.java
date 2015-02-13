@@ -165,7 +165,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         }
 
         if (mMovie.poster != null) {
-            Picasso.with(mApplicationContext).setLoggingEnabled(false);
+            Picasso.with(mApplicationContext).setLoggingEnabled(true);
             Picasso.with(mApplicationContext).load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
         }
     }
@@ -339,7 +339,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         protected Movie getResponse() {
             Time today = new Time(Time.getCurrentTimezone());
             today.setToNow();
-            mCacheKey = "movie:mid:" + mMovie.id + ":city:" + mCity + ":date:" + today.month + today.monthDay + today.year;
+            mCacheKey = mMovie.id + mCity + today.month + today.monthDay + today.year;
             String result = null;
             Movie movie = null;
             try {
@@ -410,7 +410,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                     mShowtimesTitleView.setAlpha(1);
                     mSeparatorView.setAlpha(1);
                     if (mMovie.poster != null) {
-                        Picasso.with(mApplicationContext).setLoggingEnabled(false);
+                        Picasso.with(mApplicationContext).setLoggingEnabled(true);
                         Picasso.with(mApplicationContext).load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
                     }
                 } else {
