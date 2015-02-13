@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -54,6 +55,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +64,6 @@ import java.util.Locale;
 public class TheaterListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ObservableScrollViewCallbacks {
     private TheaterAdapter mTheaterAdapter;
     private ArrayList<Theater> mTheaterResults;
-    private String mContextTheaterAddress;
 
     private SwipeRefreshLayout mRefreshLayout;
     private ObservableRecyclerView mRecyclerView;
@@ -73,6 +74,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     private LocationRequest mLocationRequest;
     private Address mAddress;
     private String mCity;
+    private Theater mSelectedTheater;
     private Context mApplicationContext;
 
     public TheaterListFragment() {
@@ -183,7 +185,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 mAddress = addresses.get(0);
 //                final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
 //                actionBar.setSubtitle("near " + addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
-                mCity = URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8");
+                mCity = URLEncoder.encode(addresses.get(0).getLocality() + addresses.get(0).getAdminArea(), "UTF-8");
                 api.execute(lat, lon, "0", URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8"));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -219,18 +221,27 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         AdapterViewCompat.AdapterContextMenuInfo info = (AdapterViewCompat.AdapterContextMenuInfo) item.getMenuInfo();
         // Handle context actions
         if (item.getTitle().equals("Directions")){
-            // Create a Uri from an intent string. Use the result to create an Intent.
-//            Uri gmmIntentUri = Uri.parse("geo=0,0?q=" + mContextTheaterAddress);
-//
-//            // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
-//            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-//            // Make the Intent explicit by setting the Google Maps package
-//            mapIntent.setPackage("com.google.android.apps.maps");
-//
-//            // Attempt to start an activity that can handle the Intent
-//            startActivity(mapIntent);
+            String theaterString = null;
+            try {
+                theaterString = URLEncoder.encode(mSelectedTheater.address, "UTF-8");
+                Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + theaterString);
+                // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                // Make the Intent explicit by setting the Google Maps package
+                mapIntent.setPackage("com.google.android.apps.maps");
+                // Attempt to start an activity that can handle the Intent
+                if (mapIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(mapIntent);
+                }
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         } else if (item.getTitle().equals("Share")){
-
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, mSelectedTheater.name + "\n" + mSelectedTheater.address);
+            sendIntent.setType("text/plain");
+            startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_theater)));
         }
         return super.onContextItemSelected(item);
     }
@@ -310,8 +321,8 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
         @Override
         public boolean onLongClick(View v) {
-            mContextTheaterAddress = new String(mTheater.address);
-//            getActivity().openContextMenu(v);
+            mSelectedTheater = mTheater;
+            getActivity().openContextMenu(v);
             return true;
         }
     }
@@ -383,7 +394,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         }
 
         public void cacheResults(ArrayList<Theater> results) throws IOException {
-            File file = new File(getActivity().getCacheDir(), mCacheKey);
+            File file = new File(mApplicationContext.getCacheDir(), mCacheKey);
             FileOutputStream fos = new FileOutputStream(file);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(results);
@@ -392,7 +403,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         }
 
         public ArrayList<Theater> cachedResultsForKey(String cacheKey) throws IOException, ClassNotFoundException {
-            File file = new File(getActivity().getCacheDir(), cacheKey);
+            File file = new File(mApplicationContext.getCacheDir(), cacheKey);
             ArrayList<Theater> theaters = null;
             if (file.exists()) {
                 FileInputStream fis = new FileInputStream(file);

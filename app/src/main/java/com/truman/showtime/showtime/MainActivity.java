@@ -17,12 +17,12 @@ public class MainActivity extends ActionBarActivity {
     private ViewPager mViewPager;
     private SlidingTabLayout mSlidingTabLayout;
     private MixpanelAPI mMixpanel;
-    public static final String MIXPANEL_TOKEN = "a6131725e7cc0ba03dd1bb423f9ba65a";
+    private static final String MIXPANEL_TOKEN = "a6131725e7cc0ba03dd1bb423f9ba65a";
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
             mMixpanel =
-                        MixpanelAPI.getInstance(getApplicationContext(), MIXPANEL_TOKEN);
+                        MixpanelAPI.getInstance(this, MIXPANEL_TOKEN);
             setContentView(R.layout.activity_main);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             if (toolbar != null) {

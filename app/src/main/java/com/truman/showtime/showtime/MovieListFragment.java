@@ -62,19 +62,20 @@ import java.util.List;
 import java.util.Locale;
 
 public class MovieListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ObservableScrollViewCallbacks {
-    MovieAdapter mMovieAdapter;
-    List<Movie> mMovieResults;
+    private MovieAdapter mMovieAdapter;
+    private List<Movie> mMovieResults;
 
-    SwipeRefreshLayout mRefreshLayout;
-    ObservableRecyclerView mRecyclerView;
-    LinearLayoutManager mLayoutManager;
-    GoogleApiClient mGoogleApiClient;
-    ShowtimeService.Showtimes mShowtimeService;
+    private SwipeRefreshLayout mRefreshLayout;
+    private ObservableRecyclerView mRecyclerView;
+    private LinearLayoutManager mLayoutManager;
+    private GoogleApiClient mGoogleApiClient;
+    private ShowtimeService.Showtimes mShowtimeService;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
     private Address mAddress;
     private String mCity;
     private Context mApplicationContext;
+    private Movie mSelectedMovie;
 
     public MovieListFragment() {
     }
@@ -200,7 +201,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             try {
                 addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
                 mAddress = addresses.get(0);
-                mCity = URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8");
+                mCity = URLEncoder.encode(addresses.get(0).getLocality() + " " + addresses.get(0).getAdminArea(), "UTF-8");
                 api.execute(lat, lon, "0", URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8"));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -228,13 +229,19 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getActivity().getMenuInflater();
-//        inflater.inflate(R.menu.movie_menu, menu);
+        inflater.inflate(R.menu.movie, menu);
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterViewCompat.AdapterContextMenuInfo info = (AdapterViewCompat.AdapterContextMenuInfo) item.getMenuInfo();
-        // Handle context actions
+        if (item.getTitle().equals(getString(R.string.share_movie))) {
+            AdapterViewCompat.AdapterContextMenuInfo info = (AdapterViewCompat.AdapterContextMenuInfo) item.getMenuInfo();
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, mSelectedMovie.name + "\n" + "http://google.com/movies?near=" + mCity + "&mid=" + mSelectedMovie.id);
+            sendIntent.setType("text/plain");
+            startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_movie)));
+        }
         return super.onContextItemSelected(item);
     }
 
@@ -295,6 +302,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         @Override
         public boolean onLongClick(View v) {
+            mSelectedMovie = mMovie;
             getActivity().openContextMenu(v);
             return true;
         }
@@ -368,7 +376,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         public void cacheResults(List<Movie> results) throws IOException {
             List<Movie> movies = null;
-            File file = new File(getActivity().getCacheDir(), mCacheKey);
+            File file = new File(mApplicationContext.getCacheDir(), mCacheKey);
             FileOutputStream fos = new FileOutputStream(file);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(results);
@@ -377,7 +385,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         }
 
         public List<Movie> cachedResultsForKey(String cacheKey) throws IOException, ClassNotFoundException {
-            File file = new File(getActivity().getCacheDir(), cacheKey);
+            File file = new File(mApplicationContext.getCacheDir(), cacheKey);
             List<Movie> movies = null;
             if (file.exists()){
                 FileInputStream fis = new FileInputStream(file);

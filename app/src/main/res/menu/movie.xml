@@ -6,7 +6,6 @@
     <item
         android:id="@+id/menu_item_share"
         app:showAsAction="collapseActionView"
-        android:title="Share"
-        android:icon="@drawable/ic_play_circle_fill_white_48dp"
+        android:title="@string/share_movie"
         />
 </menu>

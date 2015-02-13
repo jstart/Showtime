@@ -3,20 +3,18 @@
 
     <string name="app_name">Showtimes</string>
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
     <string name="action_refresh">Refresh</string>
-    <string name="title_activity_detail">Detail</string>
-    <string name="title_activity_settings">Settings</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="movies_tab_title">Movies</string>
     <string name="theaters_tab_title">Theaters</string>
     <string name="location_services_disabled">Location Services Disabled</string>
-    <string name="no_movies_found">No Movies found</string>
+    <string name="no_movies_found">No Movies Found</string>
     <string name="showtimes_nearby_title">Showtimes nearby</string>
-    <string name="movie_details_error">Movie details not found</string>
-    <string name="theaters_not_found">No theaters found</string>
-    <string name="share_showtimes">Share showtimes</string>
-    <string name="buy_tickets">Buy tickets</string>
-    <string name="directions_theater">Directions to theater</string>
+    <string name="movie_details_error">Movie Details Not Found</string>
+    <string name="theaters_not_found">No Theaters Found</string>
+    <string name="share_showtimes">Share Showtimes</string>
+    <string name="buy_tickets">Buy Tickets</string>
+    <string name="directions_theater">Directions to Theater</string>
+    <string name="share_theater">Share Theater</string>
+    <string name="share_movie">Share Movie</string>
 
 </resources>

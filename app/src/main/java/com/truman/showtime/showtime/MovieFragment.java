@@ -37,6 +37,7 @@ import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.google.android.youtube.player.YouTubeIntents;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -180,10 +181,10 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getTitle() == getString(R.string.share_showtimes)) {
+        if (item.getTitle() == getString(R.string.share_movie)) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, mMovie.name);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, mMovie.name + "http://google.com/movies?near=" + mCity + "&mid=" + mMovie.id);
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_showtimes)));
             return true;
@@ -378,7 +379,8 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         }
 
         public void cacheResults(Movie movie) throws IOException {
-            FileOutputStream fos = mApplicationContext.openFileOutput(mCacheKey, Context.MODE_PRIVATE);
+            File file = new File(mApplicationContext.getCacheDir(), mCacheKey);
+            FileOutputStream fos = new FileOutputStream(file);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(movie);
             os.close();
@@ -386,11 +388,15 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         }
 
         public Movie cachedResultsForKey(String cacheKey) throws IOException, ClassNotFoundException {
-            FileInputStream fis = mApplicationContext.openFileInput(cacheKey);
-            ObjectInputStream is = new ObjectInputStream(fis);
-            Movie movie = (Movie) is.readObject();
-            is.close();
-            fis.close();
+            File file = new File(mApplicationContext.getCacheDir(), cacheKey);
+            Movie movie = null;
+            if (file.exists()) {
+                FileInputStream fis = new FileInputStream(file);
+                ObjectInputStream is = new ObjectInputStream(fis);
+                movie = (Movie) is.readObject();
+                is.close();
+                fis.close();
+            }
             return movie;
         }
 

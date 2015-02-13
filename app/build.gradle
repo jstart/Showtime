@@ -53,6 +53,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.+'
     compile 'com.github.ksoichiro:android-observablescrollview:1.5.+'
     compile "com.mixpanel.android:mixpanel-android:4.+@aar"
+    compile 'com.parse.bolts:bolts-android:1.+'
     compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
         transitive = true
     }
