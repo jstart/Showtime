@@ -72,7 +72,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     private ShowtimeService.Showtimes mShowtimeService;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
-    private Address mAddress;
     private String mCity;
     private Theater mSelectedTheater;
     private Context mApplicationContext;
@@ -182,7 +181,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-                mAddress = addresses.get(0);
 //                final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
 //                actionBar.setSubtitle("near " + addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
                 mCity = URLEncoder.encode(addresses.get(0).getLocality() + addresses.get(0).getAdminArea(), "UTF-8");
@@ -230,7 +228,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 // Make the Intent explicit by setting the Google Maps package
                 mapIntent.setPackage("com.google.android.apps.maps");
                 // Attempt to start an activity that can handle the Intent
-                if (mapIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                if (mapIntent.resolveActivity(mApplicationContext.getPackageManager()) != null) {
                     startActivity(mapIntent);
                 }
             } catch (UnsupportedEncodingException e) {
@@ -313,7 +311,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
             detailIntent.putExtra("Lat", String.valueOf(mLastLocation.getLatitude()));
             detailIntent.putExtra("Lon", String.valueOf(mLastLocation.getLongitude()));
-            detailIntent.putExtra("Address", mAddress);
             detailIntent.putExtra("City", mCity);
 
             startActivity(detailIntent);

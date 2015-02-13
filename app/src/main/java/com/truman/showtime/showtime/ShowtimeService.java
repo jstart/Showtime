@@ -49,7 +49,7 @@ public class ShowtimeService {
     public static Showtimes adapter() {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(API_URL)
-                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setLogLevel(RestAdapter.LogLevel.NONE)
                 .build();
 
         Showtimes showtimeAdapter = restAdapter.create(Showtimes.class);

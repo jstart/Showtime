@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Address;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -68,7 +67,6 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     String mLat;
     String mLon;
     String mCity;
-    Address mAddress;
 
     private View mSeparatorView;
     private ColorDrawable cd;
@@ -167,8 +165,8 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         }
 
         if (mMovie.poster != null) {
-            Picasso.with(getActivity()).setLoggingEnabled(true);
-            Picasso.with(getActivity()).load(mMovie.posterURLForDensity(getActivity().getApplicationContext())).into(mHeroImage);
+            Picasso.with(mApplicationContext).setLoggingEnabled(false);
+            Picasso.with(mApplicationContext).load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
         }
     }
 
@@ -214,7 +212,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                 // Make the Intent explicit by setting the Google Maps package
                 mapIntent.setPackage("com.google.android.apps.maps");
                 // Attempt to start an activity that can handle the Intent
-                if (mapIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                if (mapIntent.resolveActivity(mApplicationContext.getPackageManager()) != null) {
                     startActivity(mapIntent);
                 }
             } catch (UnsupportedEncodingException e) {
@@ -412,8 +410,8 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                     mShowtimesTitleView.setAlpha(1);
                     mSeparatorView.setAlpha(1);
                     if (mMovie.poster != null) {
-                        Picasso.with(getActivity()).setLoggingEnabled(true);
-                        Picasso.with(getActivity()).load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
+                        Picasso.with(mApplicationContext).setLoggingEnabled(false);
+                        Picasso.with(mApplicationContext).load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
                     }
                 } else {
                     ((LinearLayout)mProgressBar.getParent()).removeView(mProgressBar);

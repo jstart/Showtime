@@ -25,8 +25,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -72,7 +70,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     private ShowtimeService.Showtimes mShowtimeService;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
-    private Address mAddress;
     private String mCity;
     private Context mApplicationContext;
     private Movie mSelectedMovie;
@@ -154,13 +151,13 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
     @Override
     public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-        final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
-        actionBar.setShowHideAnimationEnabled(true);
-        if (scrollState == ScrollState.DOWN){
-            actionBar.show();
-        } else if (scrollState == ScrollState.UP){
-            actionBar.show();
-        }
+//        final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
+//        actionBar.setShowHideAnimationEnabled(true);
+//        if (scrollState == ScrollState.DOWN){
+//            actionBar.show();
+//        } else if (scrollState == ScrollState.UP){
+//            actionBar.show();
+//        }
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -200,7 +197,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-                mAddress = addresses.get(0);
                 mCity = URLEncoder.encode(addresses.get(0).getLocality() + " " + addresses.get(0).getAdminArea(), "UTF-8");
                 api.execute(lat, lon, "0", URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8"));
             } catch (IOException e) {
@@ -294,7 +290,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
             detailIntent.putExtra("Lat", String.valueOf(mLastLocation.getLatitude()));
             detailIntent.putExtra("Lon", String.valueOf(mLastLocation.getLongitude()));
-            detailIntent.putExtra("Address", mAddress);
             detailIntent.putExtra("City", mCity);
 
             startActivity(detailIntent);

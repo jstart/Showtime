@@ -1,7 +1,6 @@
 package com.truman.showtime.showtime;
 
 import android.content.Intent;
-import android.location.Address;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -28,7 +27,6 @@ public class MoviesForTheaterFragment extends android.support.v4.app.Fragment {
     String mLat;
     String mLon;
     String mCity;
-    Address mAddress;
 
     public MoviesForTheaterFragment() {
         }
@@ -88,7 +86,6 @@ public class MoviesForTheaterFragment extends android.support.v4.app.Fragment {
 
                 detailIntent.putExtra("Lat", mLat);
                 detailIntent.putExtra("Lon", mLon);
-                detailIntent.putExtra("Address", mAddress);
                 detailIntent.putExtra("City", mCity);
 
                 startActivity(detailIntent);
