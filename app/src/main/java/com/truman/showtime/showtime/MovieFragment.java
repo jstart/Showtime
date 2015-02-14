@@ -3,7 +3,6 @@ package com.truman.showtime.showtime;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -100,7 +99,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         TextView titleView = (TextView) mTheaterAdapter.mHeaderView.findViewById(R.id.titleView);
         titleView.setText(mMovie.name);
         TextView detailsView = (TextView) mTheaterAdapter.mHeaderView.findViewById(R.id.detailsView);
-        detailsView.setText("Genre: " + mMovie.genre + "\nRating: " + mMovie.rating + "\nRuntime: " + mMovie.runtime);
+        detailsView.setText(mMovie.headerDescription());
         mRecyclerView = (ObservableRecyclerView) rootView;
         mRecyclerView.setScrollViewCallbacks(this);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mApplicationContext));
@@ -137,7 +136,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         super.onViewCreated(view, savedInstanceState);
         if (mToolbar != null){
             mToolbar.setTitle("");
-            cd = new ColorDrawable(new Color().parseColor("#B71C1C"));
+            cd = new ColorDrawable(R.color.primary);
             mToolbar.setBackgroundDrawable(cd);
             cd.setAlpha(0);
         }

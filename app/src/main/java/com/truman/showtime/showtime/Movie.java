@@ -92,4 +92,19 @@ public class Movie implements Serializable {
         }
         return poster;
     }
+
+    String headerDescription() {
+        String headerDescription = "";
+        if (!genre.equalsIgnoreCase("false")){
+            headerDescription += "Genre: " + genre;
+        }
+        if (!rating.equalsIgnoreCase("false")) {
+            headerDescription += "\nRating: " + rating;
+        }
+        if (!rating.equalsIgnoreCase("false")) {
+            runtime += "\nRuntime: " + runtime;
+        }
+
+        return headerDescription;
+    }
 }
