@@ -337,7 +337,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             Geocoder geocoder = new Geocoder(mApplicationContext, Locale.getDefault());
             List<Address> addresses = null;
             try {
-                addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+                addresses = geocoder.getFromLocation(new Double(lat), new Double(lon), 1);
                 mCity = URLEncoder.encode(addresses.get(0).getLocality() + " " + addresses.get(0).getAdminArea(), "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
