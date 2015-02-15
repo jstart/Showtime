@@ -148,7 +148,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
 
         mHeroImage = (ImageView)  mTheaterAdapter.mHeaderView.findViewById(R.id.imageView);
         ImageButton playButton = (ImageButton)  mTheaterAdapter.mHeaderView.findViewById(R.id.play_button);
-        if (mMovie.trailer != null) {
+        if (!mMovie.trailer.equals("false")) {
             View.OnClickListener clickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
