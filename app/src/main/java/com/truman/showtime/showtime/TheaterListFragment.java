@@ -88,7 +88,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
-         
         refreshWithLocation();
     }
 
@@ -183,17 +182,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             String lat = String.valueOf(mLastLocation.getLatitude());
             String lon = String.valueOf(mLastLocation.getLongitude());
 
-            Geocoder geocoder = new Geocoder(mApplicationContext, Locale.getDefault());
-            List<Address> addresses = null;
-            try {
-                addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-//                final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
-//                actionBar.setSubtitle("near " + addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
-                mCity = URLEncoder.encode(addresses.get(0).getLocality() + addresses.get(0).getAdminArea(), "UTF-8");
-                api.execute(lat, lon, "0", URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            api.execute(lat, lon, "0");
         } else {
             if (Build.MODEL.contains("google_sdk") ||
                     Build.MODEL.contains("Emulator") ||
@@ -361,10 +350,20 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
     public class ShowtimeAPITask extends AsyncTask<String, String, ArrayList<Theater>> {
         String mCacheKey;
-        protected ArrayList<Theater> getResponse(String lat, String lon, String date, String city) {
+        protected ArrayList<Theater> getResponse(String lat, String lon, String date) {
             Time today = new Time(Time.getCurrentTimezone());
             today.setToNow();
-            mCacheKey = "theaters_city_" + city + "_date_" + today.month + today.monthDay + today.year;
+            Geocoder geocoder = new Geocoder(mApplicationContext, Locale.getDefault());
+            List<Address> addresses = null;
+            try {
+                addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+                mCity = URLEncoder.encode(addresses.get(0).getLocality() + " " + addresses.get(0).getAdminArea(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+            mCacheKey = "theaters_city_" + mCity + "_date_" + today.month + today.monthDay + today.year;
             String result = null;
             ArrayList<Theater> theaters = null;
             Log.d("Showtime", mCacheKey);
@@ -382,7 +381,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
             if (theaters == null) {
                 mShowtimeService = ShowtimeService.adapter();
-                theaters = mShowtimeService.listTheaters(lat, lon, date, city);
+                theaters = mShowtimeService.listTheaters(lat, lon, date, mCity);
             }
 
             return theaters;
@@ -390,7 +389,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
         @Override
         protected ArrayList<Theater> doInBackground(String... arg0) {
-            return getResponse(arg0[0], arg0[1], arg0[2], arg0[3]);
+            return getResponse(arg0[0], arg0[1], arg0[2]);
         }
 
         @Override

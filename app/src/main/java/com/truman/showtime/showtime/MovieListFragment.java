@@ -54,6 +54,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -198,15 +199,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             ShowtimeApiManager api = new ShowtimeApiManager();
             String lat = String.valueOf(mLastLocation.getLatitude());
             String lon = String.valueOf(mLastLocation.getLongitude());
-            Geocoder geocoder = new Geocoder(mApplicationContext, Locale.getDefault());
-            List<Address> addresses = null;
-            try {
-                addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-                mCity = URLEncoder.encode(addresses.get(0).getLocality() + " " + addresses.get(0).getAdminArea(), "UTF-8");
-                api.execute(lat, lon, "0", URLEncoder.encode(addresses.get(0).getLocality(), "UTF-8"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            api.execute(lat, lon, "0");
         } else {
             if (Build.MODEL.contains("google_sdk") ||
                     Build.MODEL.contains("Emulator") ||
@@ -338,10 +331,20 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
     public class ShowtimeApiManager extends AsyncTask<String, String, List<Movie>> {
         String mCacheKey;
-        protected List<Movie> getResponse(String lat, String lon, String date, String city) {
+        protected List<Movie> getResponse(String lat, String lon, String date) {
             Time today = new Time(Time.getCurrentTimezone());
             today.setToNow();
-            mCacheKey = "movies_city_" + city + "_date_" + today.month + today.monthDay + today.year;
+            Geocoder geocoder = new Geocoder(mApplicationContext, Locale.getDefault());
+            List<Address> addresses = null;
+            try {
+                addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+                mCity = URLEncoder.encode(addresses.get(0).getLocality() + " " + addresses.get(0).getAdminArea(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+            mCacheKey = "movies_city_" + mCity + "_date_" + today.month + today.monthDay + today.year;
             String result = null;
             List<Movie> movies = null;
             Log.d("Showtime", mCacheKey);
@@ -359,7 +362,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
             if (movies == null) {
                 mShowtimeService = ShowtimeService.adapter();
-                movies = mShowtimeService.listMovies(lat, lon, date, city);
+                movies = mShowtimeService.listMovies(lat, lon, date, mCity);
             }
 
             return movies;
@@ -367,7 +370,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         @Override
         protected List<Movie> doInBackground(String... arg0) {
-            return getResponse(arg0[0], arg0[1], arg0[2], arg0[3]);
+            return getResponse(arg0[0], arg0[1], arg0[2]);
         }
 
         @Override
