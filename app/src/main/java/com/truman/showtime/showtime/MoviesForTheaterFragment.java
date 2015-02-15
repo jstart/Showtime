@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by ctruman on 1/21/15.
@@ -36,7 +35,7 @@ public class MoviesForTheaterFragment extends android.support.v4.app.Fragment {
                                  Bundle savedInstanceState) {
             mMovieAdapter = new MovieAdapter();
 
-            View rootView = inflater.inflate(R.layout.fragment_theaters_for_movie, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_movies_for_theater, container, false);
             mLayoutManager = new LinearLayoutManager(getActivity());
             RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview);
             mRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
@@ -74,7 +73,6 @@ public class MoviesForTheaterFragment extends android.support.v4.app.Fragment {
                 TextView showtimeTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
                 titleTextView.setText(mMovie.name);
 
-                List<String> showtimes = mMovie.showtimes;
                 showtimeTextView.setText(mMovie.showtimesString());
             }
 
@@ -112,5 +110,4 @@ public class MoviesForTheaterFragment extends android.support.v4.app.Fragment {
                 return mMovieResults.size();
             }
         }
-
 }

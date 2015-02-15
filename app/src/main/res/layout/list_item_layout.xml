@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
-        android:gravity="center_vertical"
+        android:gravity="center_vertical|fill"
         android:id="@+id/list_item_theater_textview"
         android:textSize="@dimen/abc_text_size_medium_material"
         android:minLines="1"
@@ -26,7 +26,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:gravity="center_vertical|fill"
         android:id="@+id/list_item_theater_address_textview"
         android:textSize="@dimen/abc_text_size_small_material"
         android:text="1815 Hawthorne Blvd., Redondo Beach, CA"

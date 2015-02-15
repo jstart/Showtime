@@ -186,9 +186,9 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         if (item.getTitle() == getString(R.string.share_movie)) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, mMovie.name + "http://google.com/movies?near=" + mCity + "&mid=" + mMovie.id);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, mMovie.name + "\n" + "http://google.com/movies?near=" + mCity + "&mid=" + mMovie.id);
             sendIntent.setType("text/plain");
-            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_showtimes)));
+            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_movie)));
             return true;
         }
         return super.onOptionsItemSelected(item);

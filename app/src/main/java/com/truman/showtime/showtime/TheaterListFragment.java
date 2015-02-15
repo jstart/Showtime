@@ -212,8 +212,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterViewCompat.AdapterContextMenuInfo info = (AdapterViewCompat.AdapterContextMenuInfo) item.getMenuInfo();
-        // Handle context actions
-        if (item.getTitle().equals("Directions")){
+        if (item.getTitle().equals(getString(R.string.directions_theater))){
             String theaterString = null;
             try {
                 theaterString = URLEncoder.encode(mSelectedTheater.address, "UTF-8");
@@ -229,10 +228,11 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-        } else if (item.getTitle().equals("Share")){
+        } else if (item.getTitle().equals(getString(R.string.share_theater))){
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, mSelectedTheater.name + "\n" + mSelectedTheater.address);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, mSelectedTheater.name + "\n" + mSelectedTheater.address + "\n" + "http://google.com/movies?near=" + mCity + "&tid=" + mSelectedTheater.id);
+
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_theater)));
         }
