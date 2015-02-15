@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -101,7 +102,6 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         TextView detailsView = (TextView) mTheaterAdapter.mHeaderView.findViewById(R.id.detailsView);
         detailsView.setText(mMovie.headerDescription());
         mRecyclerView = (ObservableRecyclerView) rootView;
-        mRecyclerView.setScrollViewCallbacks(this);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mApplicationContext));
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -135,10 +135,15 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (mToolbar != null){
-            mToolbar.setTitle("");
-            cd = new ColorDrawable(R.color.primary);
-            mToolbar.setBackgroundDrawable(cd);
-            cd.setAlpha(0);
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mToolbar.setTitle("");
+                cd = new ColorDrawable(getResources().getColor(R.color.primary_dark));
+                mToolbar.setBackgroundDrawable(cd);
+                cd.setAlpha(0);
+                mRecyclerView.setScrollViewCallbacks(this);
+            } else {
+                mToolbar.setTitle(mMovie.name);
+            }
         }
 
         mHeroImage = (ImageView)  mTheaterAdapter.mHeaderView.findViewById(R.id.imageView);

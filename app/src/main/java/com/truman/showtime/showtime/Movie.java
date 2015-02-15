@@ -101,8 +101,8 @@ public class Movie implements Serializable {
         if (!rating.equalsIgnoreCase("false")) {
             headerDescription += "\nRating: " + rating;
         }
-        if (!rating.equalsIgnoreCase("false")) {
-            runtime += "\nRuntime: " + runtime;
+        if (!runtime.equalsIgnoreCase("false")) {
+            headerDescription += "\nRuntime: " + runtime;
         }
 
         return headerDescription;

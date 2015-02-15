@@ -107,10 +107,10 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         buildGoogleApiClient();
         mGoogleApiClient.connect();
-//        mLocationRequest = LocationRequest.create()
-//                .setPriority(LocationRequest.PRIORITY_NO_POWER)
-//                .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
-//                .setFastestInterval(100 * 1000); // 100 second, in milliseconds
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_LOW_POWER)
+                .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
+                .setFastestInterval(100 * 1000); // 100 seconds, in milliseconds
 
         return rootView;
     }
