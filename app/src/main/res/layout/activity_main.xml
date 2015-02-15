@@ -16,7 +16,6 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="10dp"
         android:theme="@style/ShowtimeActionBar"
         android:background="?attr/colorPrimaryDark"/>
     <com.truman.showtime.showtime.SlidingTabLayout

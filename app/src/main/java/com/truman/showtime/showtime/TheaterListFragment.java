@@ -87,6 +87,8 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
     @Override
     public void onLocationChanged(Location location) {
+        mLastLocation = location;
+         
         refreshWithLocation();
     }
 
@@ -98,6 +100,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
+        mRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.primary));
         mRefreshLayout.setOnRefreshListener(this);
 
         mRecyclerView = (ObservableRecyclerView) rootView.findViewById(R.id.listview);
@@ -160,18 +163,21 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         if (mLastLocation != null) {
             Location newLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
-            if (mLastLocation.getLatitude() == newLocation.getLatitude() && mLastLocation.getLongitude() == newLocation.getLongitude()){
-                mRefreshLayout.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mRefreshLayout.setRefreshing(false);
-                    }
-                });
-                return;
+            if (newLocation != null){
+                if (mLastLocation.getLatitude() == newLocation.getLatitude() && mLastLocation.getLongitude() == newLocation.getLongitude()){
+                    mRefreshLayout.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mRefreshLayout.setRefreshing(false);
+                        }
+                    });
+                    return;
+                }
             }
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
+                mGoogleApiClient) != null ? LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient) : mLastLocation;
         if (mLastLocation != null) {
             ShowtimeAPITask api = new ShowtimeAPITask();
             String lat = String.valueOf(mLastLocation.getLatitude());
