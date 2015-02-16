@@ -159,9 +159,11 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                 public void onClick(View v) {
                     if (YouTubeIntents.canResolvePlayVideoIntent(mApplicationContext)) {
                         Intent youtubeIntent = YouTubeIntents.createPlayVideoIntent(mApplicationContext, mMovie.youtubeID());
+                        youtubeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
                         startActivity(youtubeIntent);
                     } else {
                         Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
                         i.setData(Uri.parse(mMovie.trailer));
                         startActivity(i);
                     }
@@ -191,6 +193,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         if (item.getTitle() == getString(R.string.share_movie)) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
             sendIntent.putExtra(Intent.EXTRA_TEXT, mMovie.name + "\n" + "http://google.com/movies?near=" + mCity + "&mid=" + mMovie.id);
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_movie)));

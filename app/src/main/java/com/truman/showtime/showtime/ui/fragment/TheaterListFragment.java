@@ -226,6 +226,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + theaterString);
                 // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
                 // Make the Intent explicit by setting the Google Maps package
                 mapIntent.setPackage("com.google.android.apps.maps");
                 // Attempt to start an activity that can handle the Intent
@@ -238,6 +239,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         } else if (item.getTitle().equals(getString(R.string.share_theater))){
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
             sendIntent.putExtra(Intent.EXTRA_TEXT, mSelectedTheater.name + "\n" + mSelectedTheater.address + "\n" + "http://google.com/movies?near=" + mCity + "&tid=" + mSelectedTheater.id);
 
             sendIntent.setType("text/plain");
