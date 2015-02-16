@@ -230,7 +230,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         } else if (item.getTitle().equals(getString(R.string.share_showtimes))){
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, mMovie.name + "\n" + mSelectedTheater.name + "\n" + mSelectedTheater.address + "\n" + mSelectedTheater.showtimesString() + "http://google.com/movies?near=" + mCity + "&mid=" + mMovie.id);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, mMovie.name + "\n" + mSelectedTheater.name + "\n" + mSelectedTheater.address + "\n" + mSelectedTheater.showtimesString() + "\nhttp://google.com/movies?near=" + mCity + "&mid=" + mMovie.id);
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_showtimes)));
         } else if (item.getTitle().equals(getString(R.string.buy_tickets))){
