@@ -66,6 +66,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static com.truman.showtime.showtime.service.ShowtimeService.Showtimes;
+
 public class TheaterListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ObservableScrollViewCallbacks {
     private TheaterAdapter mTheaterAdapter;
     private ArrayList<Theater> mTheaterResults;
@@ -74,7 +76,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     private ObservableRecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private GoogleApiClient mGoogleApiClient;
-    private ShowtimeService.Showtimes mShowtimeService;
+    private Showtimes mShowtimeService;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
     private String mCity;

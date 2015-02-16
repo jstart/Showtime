@@ -69,9 +69,9 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     private Theater mSelectedTheater;
     private Context mApplicationContext;
 
-    String mLat;
-    String mLon;
-    String mCity;
+    public String mLat;
+    public String mLon;
+    public String mCity;
 
     private View mSeparatorView;
     private ColorDrawable cd;

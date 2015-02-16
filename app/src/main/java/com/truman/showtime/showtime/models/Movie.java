@@ -12,19 +12,19 @@ import java.util.regex.Pattern;
  */
 
 public class Movie implements Serializable {
-    String id;
-    String name;
+    public String id;
+    public String name;
     String runtime;
     String rating;
     String genre;
     String imdb;
-    String trailer;
+    public String trailer;
     List<String> showtimes;
 
-    String poster;
+    public String poster;
     String director;
-    String description;
-    List<Theater> theaters;
+    public String description;
+    public List<Theater> theaters;
 
     public String youtubePreviewImageURL(){
         return "https://i.ytimg.com/vi/" + youtubeID() + "/hqdefault.jpg";
@@ -75,7 +75,7 @@ public class Movie implements Serializable {
         }
         return "ldpi";
     }
-    String posterURLForDensity(Context context){
+    public String posterURLForDensity(Context context){
         switch (getDensityName(context)) {
             case "ldpi":
                 return poster;
@@ -93,7 +93,7 @@ public class Movie implements Serializable {
         return poster;
     }
 
-    String headerDescription() {
+    public String headerDescription() {
         String headerDescription = "";
         if (!genre.equalsIgnoreCase("false")){
             headerDescription += "Genre: " + genre;

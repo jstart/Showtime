@@ -15,7 +15,7 @@ public class ShowtimeService {
     private static final String API_URL = "https://showtime-server.herokuapp.com";
     private static final String OMDB_API_URL = "http://www.omdbapi.com";
 
-    interface Showtimes {
+    public interface Showtimes {
         @GET("/showtimes")
         ArrayList<Theater> listTheaters(
                 @Query("lat") String lat,

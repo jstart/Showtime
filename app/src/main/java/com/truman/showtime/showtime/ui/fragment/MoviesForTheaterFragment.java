@@ -29,9 +29,9 @@ public class MoviesForTheaterFragment extends android.support.v4.app.Fragment {
     RecyclerView mRecyclerView;
     LinearLayoutManager mLayoutManager;
     SwipeRefreshLayout mRefreshLayout;
-    String mLat;
-    String mLon;
-    String mCity;
+    public String mLat;
+    public String mLon;
+    public String mCity;
 
     public MoviesForTheaterFragment() {
         }

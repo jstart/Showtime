@@ -4,11 +4,11 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Theater implements Serializable {
-    String id;
-    String name;
-    String address;
+    public String id;
+    public String name;
+    public String address;
     String phoneNumber;
-    List<Movie> movies;
+    public List<Movie> movies;
     List<String> showtimes;
 
     public String showtimesString() {
