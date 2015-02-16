@@ -9,7 +9,7 @@
     android:paddingRight="0dp"
     android:paddingTop="0dp"
     android:paddingBottom="0dp"
-    tools:context="com.truman.showtime.showtime.DetailActivity"
+    tools:context="com.truman.showtime.showtime.ui.activity.DetailActivity"
     tools:ignore="MergeRootFrame" >
     <android.support.v7.widget.Toolbar
         xmlns:android="http://schemas.android.com/apk/res/android"

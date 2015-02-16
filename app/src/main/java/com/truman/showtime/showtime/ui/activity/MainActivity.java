@@ -1,4 +1,4 @@
-package com.truman.showtime.showtime;
+package com.truman.showtime.showtime.ui.activity;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,6 +10,10 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.truman.showtime.showtime.ui.fragment.MovieListFragment;
+import com.truman.showtime.showtime.R;
+import com.truman.showtime.showtime.ui.view.SlidingTabLayout;
+import com.truman.showtime.showtime.ui.fragment.TheaterListFragment;
 
 
 public class MainActivity extends ActionBarActivity {

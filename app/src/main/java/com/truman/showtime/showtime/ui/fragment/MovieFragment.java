@@ -1,4 +1,4 @@
-package com.truman.showtime.showtime;
+package com.truman.showtime.showtime.ui.fragment;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -35,6 +35,11 @@ import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCal
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.google.android.youtube.player.YouTubeIntents;
 import com.squareup.picasso.Picasso;
+import com.truman.showtime.showtime.R;
+import com.truman.showtime.showtime.service.ShowtimeService;
+import com.truman.showtime.showtime.ui.view.SimpleDividerItemDecoration;
+import com.truman.showtime.showtime.models.Movie;
+import com.truman.showtime.showtime.models.Theater;
 
 import java.io.File;
 import java.io.FileInputStream;

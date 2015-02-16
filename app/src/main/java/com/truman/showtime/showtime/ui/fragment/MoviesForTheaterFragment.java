@@ -1,4 +1,4 @@
-package com.truman.showtime.showtime;
+package com.truman.showtime.showtime.ui.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.truman.showtime.showtime.R;
+import com.truman.showtime.showtime.ui.view.SimpleDividerItemDecoration;
+import com.truman.showtime.showtime.models.Movie;
+import com.truman.showtime.showtime.models.Theater;
+import com.truman.showtime.showtime.ui.activity.DetailActivity;
 
 import java.util.ArrayList;
 

@@ -1,8 +1,12 @@
-package com.truman.showtime.showtime;
+package com.truman.showtime.showtime.ui.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+
+import com.truman.showtime.showtime.ui.fragment.MovieFragment;
+import com.truman.showtime.showtime.ui.fragment.MoviesForTheaterFragment;
+import com.truman.showtime.showtime.R;
 
 public class DetailActivity extends ActionBarActivity {
     String mLat;

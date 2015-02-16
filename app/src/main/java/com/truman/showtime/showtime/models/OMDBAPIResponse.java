@@ -1,4 +1,4 @@
-package com.truman.showtime.showtime;
+package com.truman.showtime.showtime.models;
 
 import android.content.Context;
 

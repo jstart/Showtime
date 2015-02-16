@@ -1,10 +1,12 @@
-package com.truman.showtime.showtime;
+package com.truman.showtime.showtime.ui.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+
+import com.truman.showtime.showtime.R;
 
 /**
 * Created by ctruman on 1/28/15.

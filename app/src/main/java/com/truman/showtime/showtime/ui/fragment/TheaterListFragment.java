@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.truman.showtime.showtime;
+package com.truman.showtime.showtime.ui.fragment;
 
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,6 +48,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.truman.showtime.showtime.R;
+import com.truman.showtime.showtime.service.ShowtimeService;
+import com.truman.showtime.showtime.ui.view.SimpleDividerItemDecoration;
+import com.truman.showtime.showtime.models.Theater;
+import com.truman.showtime.showtime.ui.activity.DetailActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,9 +66,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MovieListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ObservableScrollViewCallbacks {
-    private MovieAdapter mMovieAdapter;
-    private List<Movie> mMovieResults;
+public class TheaterListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ObservableScrollViewCallbacks {
+    private TheaterAdapter mTheaterAdapter;
+    private ArrayList<Theater> mTheaterResults;
 
     private SwipeRefreshLayout mRefreshLayout;
     private ObservableRecyclerView mRecyclerView;
@@ -72,10 +78,10 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
     private String mCity;
+    private Theater mSelectedTheater;
     private Context mApplicationContext;
-    private Movie mSelectedMovie;
 
-    public MovieListFragment() {
+    public TheaterListFragment() {
     }
 
     @Override
@@ -93,27 +99,27 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mMovieResults = new ArrayList<Movie>();
-        mMovieAdapter = new MovieAdapter();
+        mTheaterResults = new ArrayList<Theater>();
+        mTheaterAdapter = new TheaterAdapter();
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
-        mRefreshLayout.setOnRefreshListener(this);
         mRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.primary));
+        mRefreshLayout.setOnRefreshListener(this);
 
         mRecyclerView = (ObservableRecyclerView) rootView.findViewById(R.id.listview);
         mRecyclerView.setScrollViewCallbacks(this);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mApplicationContext));
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mMovieAdapter);
+        mRecyclerView.setAdapter(mTheaterAdapter);
 
         buildGoogleApiClient();
         mGoogleApiClient.connect();
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_LOW_POWER)
                 .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
-                .setFastestInterval(100 * 1000); // 100 seconds, in milliseconds
+                .setFastestInterval(100 * 1000); // 100 second, in milliseconds
 
         return rootView;
     }
@@ -142,25 +148,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
-    }
-
-    @Override
-    public void onScrollChanged(int i, boolean b, boolean b2) {
-    }
-
-    @Override
-    public void onDownMotionEvent() {
-    }
-
-    @Override
-    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-//        final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
-//        actionBar.setShowHideAnimationEnabled(true);
-//        if (scrollState == ScrollState.DOWN){
-//            actionBar.show();
-//        } else if (scrollState == ScrollState.UP){
-//            actionBar.show();
-//        }
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -196,15 +183,16 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 mGoogleApiClient) != null ? LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient) : mLastLocation;
         if (mLastLocation != null) {
-            ShowtimeApiManager api = new ShowtimeApiManager();
+            ShowtimeAPITask api = new ShowtimeAPITask();
             String lat = String.valueOf(mLastLocation.getLatitude());
             String lon = String.valueOf(mLastLocation.getLongitude());
+
             api.execute(lat, lon, "0");
         } else {
             if (Build.MODEL.contains("google_sdk") ||
                     Build.MODEL.contains("Emulator") ||
                     Build.MODEL.contains("Android SDK")) {
-                ShowtimeApiManager api = new ShowtimeApiManager();
+                ShowtimeAPITask api = new ShowtimeAPITask();
                 api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
             } else {
                 LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
@@ -223,18 +211,35 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.movie, menu);
+        inflater.inflate(R.menu.theater_menu, menu);
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if (item.getTitle().equals(getString(R.string.share_movie))) {
-            AdapterViewCompat.AdapterContextMenuInfo info = (AdapterViewCompat.AdapterContextMenuInfo) item.getMenuInfo();
+        AdapterViewCompat.AdapterContextMenuInfo info = (AdapterViewCompat.AdapterContextMenuInfo) item.getMenuInfo();
+        if (item.getTitle().equals(getString(R.string.directions_theater))){
+            String theaterString = null;
+            try {
+                theaterString = URLEncoder.encode(mSelectedTheater.address, "UTF-8");
+                Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + theaterString);
+                // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                // Make the Intent explicit by setting the Google Maps package
+                mapIntent.setPackage("com.google.android.apps.maps");
+                // Attempt to start an activity that can handle the Intent
+                if (mapIntent.resolveActivity(mApplicationContext.getPackageManager()) != null) {
+                    startActivity(mapIntent);
+                }
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        } else if (item.getTitle().equals(getString(R.string.share_theater))){
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, mSelectedMovie.name + "\n" + "http://google.com/movies?near=" + mCity + "&mid=" + mSelectedMovie.id);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, mSelectedTheater.name + "\n" + mSelectedTheater.address + "\n" + "http://google.com/movies?near=" + mCity + "&tid=" + mSelectedTheater.id);
+
             sendIntent.setType("text/plain");
-            startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_movie)));
+            startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_theater)));
         }
         return super.onContextItemSelected(item);
     }
@@ -251,40 +256,59 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
-        mRefreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                mRefreshLayout.setRefreshing(false);
-            }
-        });
-
+        Log.d("Showtime", Build.MODEL);
+        if (Build.MODEL.contains("google_sdk") ||
+                Build.MODEL.contains("Emulator") ||
+                Build.MODEL.contains("Android SDK")) {
+            refreshWithLocation();
+        } else {
+            Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
+            mRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mRefreshLayout.setRefreshing(false);
+                }
+            });
+        }
     }
 
-    private class MovieHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        private Movie mMovie;
+    @Override
+    public void onScrollChanged(int i, boolean b, boolean b2) {
+    }
 
-        public MovieHolder(View itemView) {
+    @Override
+    public void onDownMotionEvent() {
+    }
+
+    @Override
+    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
+    }
+
+    private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+        private Theater mTheater;
+
+        public TheaterHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
             registerForContextMenu(itemView);
         }
 
-        public void bindMovie(Movie movie) {
-            mMovie = movie;
+        public void bindTheater(Theater theater) {
+            mTheater = theater;
             TextView titleTextView = (TextView) itemView.findViewById(R.id.list_item_theater_textview);
             TextView addressTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
 
-            titleTextView.setText(mMovie.name);
-            addressTextView.setText(mMovie.description);
+            titleTextView.setText(mTheater.name);
+            addressTextView.setText(mTheater.address);
         }
 
         @Override
         public void onClick(View v) {
             Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
-            detailIntent.putExtra("Type", "Movie");
-            detailIntent.putExtra("MovieDetails", mMovie);
+            detailIntent.putExtra("Type", "Theater");
+            detailIntent.putExtra("TheaterDetails", mTheater);
+
             if (Build.MODEL.contains("google_sdk") ||
                     Build.MODEL.contains("Emulator") ||
                     Build.MODEL.contains("Android SDK")) {
@@ -302,36 +326,36 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         @Override
         public boolean onLongClick(View v) {
-            mSelectedMovie = mMovie;
+            mSelectedTheater = mTheater;
             getActivity().openContextMenu(v);
             return true;
         }
     }
 
-    private class MovieAdapter
-            extends RecyclerView.Adapter<MovieHolder> {
+    private class TheaterAdapter
+            extends RecyclerView.Adapter<TheaterHolder> {
         @Override
-        public MovieHolder onCreateViewHolder(ViewGroup parent, int pos) {
+        public TheaterHolder onCreateViewHolder(ViewGroup parent, int pos) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.list_item_layout, parent, false);
-            return new MovieHolder(view);
+            return new TheaterHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(MovieHolder holder, int pos) {
-            Movie movie = mMovieResults.get(pos);
-            holder.bindMovie(movie);
+        public void onBindViewHolder(TheaterHolder holder, int pos) {
+            Theater theater = mTheaterResults.get(pos);
+            holder.bindTheater(theater);
         }
 
         @Override
         public int getItemCount() {
-            return mMovieResults.size();
+            return mTheaterResults.size();
         }
     }
 
-    public class ShowtimeApiManager extends AsyncTask<String, String, List<Movie>> {
+    public class ShowtimeAPITask extends AsyncTask<String, String, ArrayList<Theater>> {
         String mCacheKey;
-        protected List<Movie> getResponse(String lat, String lon, String date) {
+        protected ArrayList<Theater> getResponse(String lat, String lon, String date) {
             Time today = new Time(Time.getCurrentTimezone());
             today.setToNow();
             Geocoder geocoder = new Geocoder(mApplicationContext, Locale.getDefault());
@@ -344,38 +368,38 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             } catch (IOException e){
                 e.printStackTrace();
             }
-            mCacheKey = "movies_city_" + mCity + "_date_" + today.month + today.monthDay + today.year;
+            mCacheKey = "theaters_city_" + mCity + "_date_" + today.month + today.monthDay + today.year;
             String result = null;
-            List<Movie> movies = null;
+            ArrayList<Theater> theaters = null;
             Log.d("Showtime", mCacheKey);
             try {
-                movies = cachedResultsForKey(mCacheKey);
-                Log.d("Showtime", "Movies Cache hit");
+                theaters = cachedResultsForKey(mCacheKey);
+                Log.d("Showtime", "theaters Cache hit");
             } catch (IOException e) {
 //                e.printStackTrace();
-                Log.d("Showtime", "movies ioexception miss");
+                Log.d("Showtime", "theaters ioexception miss");
 
             } catch (ClassNotFoundException e) {
 //                e.printStackTrace();
-                Log.d("Showtime", "movies class not found miss");
+                Log.d("Showtime", "theaters class not found miss");
             }
 
-            if (movies == null) {
+            if (theaters == null) {
                 mShowtimeService = ShowtimeService.adapter();
-                movies = mShowtimeService.listMovies(lat, lon, date, mCity);
+                theaters = mShowtimeService.listTheaters(lat, lon, date, mCity);
             }
 
-            return movies;
+            return theaters;
         }
 
         @Override
-        protected List<Movie> doInBackground(String... arg0) {
+        protected ArrayList<Theater> doInBackground(String... arg0) {
             return getResponse(arg0[0], arg0[1], arg0[2]);
         }
 
         @Override
-        protected void onPostExecute(List<Movie> results) {
-            mMovieResults = results;
+        protected void onPostExecute(ArrayList<Theater> results) {
+            mTheaterResults = results;
             try {
                 cacheResults(results);
             } catch (IOException e) {
@@ -384,8 +408,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             parseAndReloadResults(results);
         }
 
-        public void cacheResults(List<Movie> results) throws IOException {
-            List<Movie> movies = null;
+        public void cacheResults(ArrayList<Theater> results) throws IOException {
             File file = new File(mApplicationContext.getCacheDir(), mCacheKey);
             FileOutputStream fos = new FileOutputStream(file);
             ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -394,27 +417,26 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             fos.close();
         }
 
-        public List<Movie> cachedResultsForKey(String cacheKey) throws IOException, ClassNotFoundException {
+        public ArrayList<Theater> cachedResultsForKey(String cacheKey) throws IOException, ClassNotFoundException {
             File file = new File(mApplicationContext.getCacheDir(), cacheKey);
-            List<Movie> movies = null;
-            if (file.exists()){
+            ArrayList<Theater> theaters = null;
+            if (file.exists()) {
                 FileInputStream fis = new FileInputStream(file);
                 ObjectInputStream is = new ObjectInputStream(fis);
-                movies = (List<Movie>) is.readObject();
+                theaters = (ArrayList<Theater>) is.readObject();
                 is.close();
                 fis.close();
             }
-
-            return movies;
+            return theaters;
         }
 
-        public void parseAndReloadResults(List<Movie> result){
+        public void parseAndReloadResults(ArrayList<Theater> result){
             if (result.size() > 0){
-                mMovieAdapter.notifyDataSetChanged();
+                mTheaterAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
             } else {
                 mRefreshLayout.setRefreshing(false);
-                Toast.makeText(mApplicationContext, getString(R.string.no_movies_found), Toast.LENGTH_LONG).show();
+                Toast.makeText(mApplicationContext, getString(R.string.theaters_not_found), Toast.LENGTH_LONG).show();
             }
         }
     }

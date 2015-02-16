@@ -1,4 +1,4 @@
-package com.truman.showtime.showtime;
+package com.truman.showtime.showtime.application;
 
 import android.app.Application;
 

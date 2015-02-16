@@ -18,7 +18,7 @@
         <screen android:screenSize="normal" android:screenDensity="480" />
     </compatible-screens>
     <application
-        android:name="com.truman.showtime.showtime.ShowtimeApplication"
+        android:name=".application.ShowtimeApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -27,7 +27,7 @@
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.activity.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -36,12 +36,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DetailActivity"
-            android:parentActivityName=".MainActivity"
+            android:name=".ui.activity.DetailActivity"
+            android:parentActivityName=".ui.activity.MainActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.truman.showtime.showtime.MainActivity" />
+                android:value=".ui.activity.MainActivity" />
         </activity>
         <activity android:name="com.mixpanel.android.surveys.SurveyActivity" />
         <receiver

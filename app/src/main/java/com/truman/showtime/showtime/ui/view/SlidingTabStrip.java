@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.truman.showtime.showtime;
+package com.truman.showtime.showtime.ui.view;
 
 import android.R;
 import android.content.Context;

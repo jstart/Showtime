@@ -1,4 +1,8 @@
-package com.truman.showtime.showtime;
+package com.truman.showtime.showtime.service;
+
+import com.truman.showtime.showtime.models.Movie;
+import com.truman.showtime.showtime.models.OMDBAPIResponse;
+import com.truman.showtime.showtime.models.Theater;
 
 import java.util.ArrayList;
 

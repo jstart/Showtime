@@ -1,4 +1,4 @@
-package com.truman.showtime.showtime;
+package com.truman.showtime.showtime.ui.activity;
 
 import android.os.Bundle;
 import android.preference.ListPreference;

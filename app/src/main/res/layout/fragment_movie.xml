@@ -3,5 +3,5 @@
     android:orientation="vertical"
     android:layout_height="match_parent"
     android:id="@+id/recyclerView"
-    tools:context="com.truman.showtime.showtime.MovieFragment">
+    tools:context="com.truman.showtime.showtime.ui.fragment.MovieFragment">
 </com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView>

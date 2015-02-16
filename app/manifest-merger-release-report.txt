@@ -133,7 +133,7 @@ MERGED from com.google.android.gms:play-services:6.5.87:21:9
 		ADDED from AndroidManifest.xml:27:20
 	android:value
 		ADDED from AndroidManifest.xml:28:13
-activity#com.truman.showtime.showtime.MainActivity
+activity#com.truman.showtime.showtime.ui.activity.MainActivity
 ADDED from AndroidManifest.xml:29:9
 	android:screenOrientation
 		ADDED from AndroidManifest.xml:32:13
@@ -151,7 +151,7 @@ category#android.intent.category.LAUNCHER
 ADDED from AndroidManifest.xml:35:17
 	android:name
 		ADDED from AndroidManifest.xml:35:27
-activity#com.truman.showtime.showtime.DetailActivity
+activity#com.truman.showtime.showtime.ui.activity.DetailActivity
 ADDED from AndroidManifest.xml:38:9
 	android:screenOrientation
 		ADDED from AndroidManifest.xml:41:13
