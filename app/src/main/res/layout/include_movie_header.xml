@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/table_layout"
+    >
     <FrameLayout
         android:id="@+id/video_frame"
         android:layout_width="fill_parent"
