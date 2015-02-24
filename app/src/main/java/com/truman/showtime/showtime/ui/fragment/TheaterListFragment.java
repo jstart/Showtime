@@ -372,9 +372,17 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             } catch (IOException e){
                 e.printStackTrace();
             }
-            mCacheKey = "theaters_city_" + mCity + "_date_" + today.month + today.monthDay + today.year;
-            String result = null;
+
             ArrayList<Theater> theaters = null;
+
+            if (mCity == null) {
+                mShowtimeService = ShowtimeService.adapter();
+                theaters = mShowtimeService.listTheaters(lat, lon, date, "");
+                return theaters;
+            }
+
+            mCacheKey = "theaters_city_" + mCity + "_date_" + today.month + today.monthDay + today.year;
+
             Log.d("Showtime", mCacheKey);
             try {
                 theaters = cachedResultsForKey(mCacheKey);
@@ -413,12 +421,14 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         }
 
         public void cacheResults(ArrayList<Theater> results) throws IOException {
-            File file = new File(mApplicationContext.getCacheDir(), mCacheKey);
-            FileOutputStream fos = new FileOutputStream(file);
-            ObjectOutputStream os = new ObjectOutputStream(fos);
-            os.writeObject(results);
-            os.close();
-            fos.close();
+            if (results != null) {
+                File file = new File(mApplicationContext.getCacheDir(), mCacheKey);
+                FileOutputStream fos = new FileOutputStream(file);
+                ObjectOutputStream os = new ObjectOutputStream(fos);
+                os.writeObject(results);
+                os.close();
+                fos.close();
+            }
         }
 
         public ArrayList<Theater> cachedResultsForKey(String cacheKey) throws IOException, ClassNotFoundException {

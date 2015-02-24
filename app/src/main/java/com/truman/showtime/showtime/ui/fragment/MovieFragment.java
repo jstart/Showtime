@@ -3,6 +3,8 @@ package com.truman.showtime.showtime.ui.fragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -23,10 +25,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,11 +55,13 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MovieFragment extends android.support.v4.app.Fragment implements ObservableScrollViewCallbacks {
+public class MovieFragment extends android.support.v4.app.Fragment implements ObservableScrollViewCallbacks, AdapterView.OnItemSelectedListener {
 
     private Movie mMovie;
     private ActionBar mToolbar;
@@ -65,6 +72,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     private TextView mShowtimesTitleView;
     private LinearLayout mDetailsLayout;
     private ProgressBar mProgressBar;
+    private Spinner mSpinner;
     private ShowtimeService.Showtimes mShowtimeService;
     private Theater mSelectedTheater;
     private Context mApplicationContext;
@@ -99,7 +107,6 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_movie, container, false);
         mTheaterAdapter = new TheaterAdapter();
-
         mTheaterAdapter.mHeaderView = inflater.inflate(R.layout.include_movie_header, container, false);
 
         TextView titleView = (TextView) mTheaterAdapter.mHeaderView.findViewById(R.id.titleView);
@@ -117,6 +124,13 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         mSeparatorView = (View) mTheaterAdapter.mHeaderView.findViewById(R.id.separator);
         mDetailsLayout = (LinearLayout) mTheaterAdapter.mHeaderView.findViewById(R.id.detail_layout);
         mProgressBar = (ProgressBar) mTheaterAdapter.mHeaderView.findViewById(R.id.progress_bar);
+
+        mSpinner = (Spinner) mTheaterAdapter.mHeaderView.findViewById(R.id.today_spinner);
+        List<String> list = new ArrayList<String>(Arrays.asList("Today", "Tomorrow", "Friday"));
+        ArrayAdapter adapter = new ArrayAdapter(mApplicationContext, R.layout.spinner_item, list);
+        mSpinner.setAdapter(adapter);
+        mSpinner.setOnItemSelectedListener(this);
+        mSpinner.getBackground().setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_ATOP);
 
         if (mMovie.description != null) {
             mDescriptionView.setText(mMovie.description);
@@ -272,6 +286,16 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
 
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
     private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         private Theater mTheater;
 
@@ -389,12 +413,14 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         }
 
         public void cacheResults(Movie movie) throws IOException {
-            File file = new File(mApplicationContext.getCacheDir(), mCacheKey);
-            FileOutputStream fos = new FileOutputStream(file);
-            ObjectOutputStream os = new ObjectOutputStream(fos);
-            os.writeObject(movie);
-            os.close();
-            fos.close();
+            if (movie != null) {
+                File file = new File(mApplicationContext.getCacheDir(), mCacheKey);
+                FileOutputStream fos = new FileOutputStream(file);
+                ObjectOutputStream os = new ObjectOutputStream(fos);
+                os.writeObject(movie);
+                os.close();
+                fos.close();
+            }
         }
 
         public Movie cachedResultsForKey(String cacheKey) throws IOException, ClassNotFoundException {

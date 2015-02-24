@@ -16,5 +16,7 @@
     <string name="directions_theater">Directions to Theater</string>
     <string name="share_theater">Share Theater</string>
     <string name="share_movie">Share Movie</string>
+    <string name="today">Today</string>
+    <string name="select_day">Select Day for Showtimes</string>
 
 </resources>

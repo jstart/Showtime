@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout
+    app:theme="@style/AppTheme"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/table_layout"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <FrameLayout
         android:id="@+id/video_frame"
         android:layout_width="fill_parent"
@@ -82,16 +83,32 @@
             android:layout_width="match_parent"
             android:layout_height="1dip"
             android:background="#dcdcdc" />
-        <TextView
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:paddingLeft="16dp"
-            android:paddingBottom="10dp"
-            android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textStyle="bold"
-            android:text="@string/showtimes_nearby_title"
-            android:id="@+id/showtimesTitleView" />
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingLeft="16dp"
+                android:paddingBottom="10dp"
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textStyle="bold"
+                android:layout_gravity="left"
+                android:text="@string/showtimes_nearby_title"
+                android:id="@+id/showtimesTitleView" />
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:prompt="@string/select_day"
+                android:id="@+id/today_spinner"
+                android:text="@string/today"
+                android:paddingTop="8dp"
+                android:paddingLeft="16dp"
+                android:paddingBottom="8dp"
+                android:elevation="1dp"
+                android:layout_gravity="right|center_vertical"/>
+        </FrameLayout>
     </LinearLayout>
 </TableLayout>
