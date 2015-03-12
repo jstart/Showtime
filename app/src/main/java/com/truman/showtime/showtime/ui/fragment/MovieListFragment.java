@@ -230,7 +230,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     }
 
     public void refreshWithLocation() {
-        if (mLastLocation != null && mGoogleApiClient.isConnected()) {
+
+        if (mGoogleApiClient != null && mLastLocation != null && mGoogleApiClient.isConnected()) {
             Location newLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
             if (newLocation != null){
@@ -245,7 +246,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 }
             }
         }
-        if (!mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient != null && !mGoogleApiClient.isConnected()) {
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient) != null ? LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient) : mLastLocation;

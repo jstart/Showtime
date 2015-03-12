@@ -257,7 +257,6 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         return super.onContextItemSelected(item);
     }
 
-
     @Override
     public void onScrollChanged(int i, boolean b, boolean b2) {
             cd.setAlpha(getAlphaForActionBar(i));

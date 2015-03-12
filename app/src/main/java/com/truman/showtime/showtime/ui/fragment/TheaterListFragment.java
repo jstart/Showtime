@@ -190,7 +190,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     }
 
     protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(mApplicationContext)
+        mGoogleApiClient = mGoogleApiClient != null ? mGoogleApiClient : new GoogleApiClient.Builder(mApplicationContext)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
@@ -219,7 +219,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     }
 
     public void refreshWithLocation() {
-        if (mLastLocation != null && mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient != null && mLastLocation != null && mGoogleApiClient.isConnected()) {
             Location newLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
             if (newLocation != null){
@@ -234,7 +234,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 }
             }
         }
-        if (!mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient != null && !mGoogleApiClient.isConnected()) {
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient) != null ? LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient) : mLastLocation;
