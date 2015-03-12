@@ -169,8 +169,11 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     @Override
     public void onResume() {
         super.onResume();
-        if (!mGoogleApiClient.isConnecting()){
-            mGoogleApiClient.connect();
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(mApplicationContext) == ConnectionResult.SUCCESS){
+            buildGoogleApiClient();
+            if (!mGoogleApiClient.isConnecting()){
+                mGoogleApiClient.connect();
+            }
         }
     }
 

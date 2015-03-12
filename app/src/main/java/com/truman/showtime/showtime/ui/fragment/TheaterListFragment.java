@@ -172,8 +172,11 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     @Override
     public void onResume() {
         super.onResume();
-        if (!mGoogleApiClient.isConnecting()){
-            mGoogleApiClient.connect();
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(mApplicationContext) == ConnectionResult.SUCCESS){
+            buildGoogleApiClient();
+            if (!mGoogleApiClient.isConnecting()){
+                mGoogleApiClient.connect();
+            }
         }
     }
 
