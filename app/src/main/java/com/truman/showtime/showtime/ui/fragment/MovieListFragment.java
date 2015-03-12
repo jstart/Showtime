@@ -206,7 +206,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     }
 
     protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(mApplicationContext)
+        mGoogleApiClient = mGoogleApiClient != null ? mGoogleApiClient : new GoogleApiClient.Builder(mApplicationContext)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
@@ -215,8 +215,10 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
+        }
         refreshWithLocation();
     }
 
