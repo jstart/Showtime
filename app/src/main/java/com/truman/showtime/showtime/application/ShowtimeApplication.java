@@ -14,11 +14,7 @@ public class ShowtimeApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        new Thread() {
-            public void run() {
-                Fabric.with(getApplicationContext(), new Crashlytics());
-            }
-        };
+        Fabric.with(this, new Crashlytics());
     }
 
 }

@@ -73,7 +73,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     private LinearLayout mDetailsLayout;
     private ProgressBar mProgressBar;
     private Spinner mSpinner;
-    private ShowtimeService.Showtimes mShowtimeService;
+    private ShowtimeService.Showtimes mShowtimeService = ShowtimeService.adapter();
     private Theater mSelectedTheater;
     private Context mApplicationContext;
 
@@ -126,11 +126,12 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         mProgressBar = (ProgressBar) mTheaterAdapter.mHeaderView.findViewById(R.id.progress_bar);
 
         mSpinner = (Spinner) mTheaterAdapter.mHeaderView.findViewById(R.id.today_spinner);
+        mSpinner.setVisibility(View.INVISIBLE);
         List<String> list = new ArrayList<String>(Arrays.asList("Today", "Tomorrow", "Friday"));
         ArrayAdapter adapter = new ArrayAdapter(mApplicationContext, R.layout.spinner_item, list);
-        mSpinner.setAdapter(adapter);
-        mSpinner.setOnItemSelectedListener(this);
-        mSpinner.getBackground().setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_ATOP);
+//        mSpinner.setAdapter(adapter);
+//        mSpinner.setOnItemSelectedListener(this);
+//        mSpinner.getBackground().setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_ATOP);
 
         if (mMovie.description != null) {
             mDescriptionView.setText(mMovie.description);
@@ -389,7 +390,6 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
             }
 
             if (movie == null) {
-                mShowtimeService = ShowtimeService.adapter();
                 movie = mShowtimeService.movieDetails(mMovie.id, mLat, mLon, "0", mCity);
             }
 

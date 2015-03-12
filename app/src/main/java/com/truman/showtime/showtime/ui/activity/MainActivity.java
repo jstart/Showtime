@@ -1,5 +1,6 @@
 package com.truman.showtime.showtime.ui.activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.truman.showtime.showtime.ui.fragment.MovieListFragment;
@@ -25,42 +27,48 @@ public class MainActivity extends ActionBarActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-            mMixpanel =
-                        MixpanelAPI.getInstance(this, MIXPANEL_TOKEN);
-            setContentView(R.layout.activity_main);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            if (toolbar != null) {
-                setSupportActionBar(toolbar);
+        mMixpanel =
+                MixpanelAPI.getInstance(this, MIXPANEL_TOKEN);
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+        }
+        mDemoCollectionPagerAdapter =
+                new ShowtimePagerAdapter(
+                        getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(mDemoCollectionPagerAdapter);
+        mViewPager.setOnPageChangeListener(
+                new ViewPager.SimpleOnPageChangeListener() {
+                    @Override
+                    public void onPageSelected(int position) {
+                    }
+                });
+        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        mSlidingTabLayout.setViewPager(mViewPager);
+        mSlidingTabLayout.setSelectedIndicatorColors(Color.WHITE);
+        mSlidingTabLayout.setBackgroundColor(getResources().getColor(R.color.primary_dark));
+        mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             }
-            mDemoCollectionPagerAdapter =
-                    new ShowtimePagerAdapter(
-                            getSupportFragmentManager());
-            mViewPager = (ViewPager) findViewById(R.id.pager);
-            mViewPager.setAdapter(mDemoCollectionPagerAdapter);
-            mViewPager.setOnPageChangeListener(
-                    new ViewPager.SimpleOnPageChangeListener() {
-                        @Override
-                        public void onPageSelected(int position) {
-                        }
-                    });
-            mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-            mSlidingTabLayout.setViewPager(mViewPager);
-            mSlidingTabLayout.setSelectedIndicatorColors(Color.WHITE);
-            mSlidingTabLayout.setBackgroundColor(getResources().getColor(R.color.primary_dark));
-            mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                }
 
-                @Override
-                public void onPageSelected(int position) {
-                    mViewPager.setCurrentItem(position, true);
-                }
+            @Override
+            public void onPageSelected(int position) {
+                mViewPager.setCurrentItem(position, true);
+            }
 
-                @Override
-                public void onPageScrollStateChanged(int state) {
-                }
-            });
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+        findViewById(R.id.pager).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, DetailActivity.class));
+            }
+        });
     }
 
     protected void onDestroy() {

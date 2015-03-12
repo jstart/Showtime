@@ -182,6 +182,16 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     }
 
     public void refreshWithLocation() {
+        if (!mGoogleApiClient.isConnected()){
+            mRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mRefreshLayout.setRefreshing(false);
+                }
+            });
+            Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
+            return;
+        }
         if (mLastLocation != null) {
             Location newLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
