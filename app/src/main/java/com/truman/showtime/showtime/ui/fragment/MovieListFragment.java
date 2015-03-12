@@ -120,7 +120,29 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 .setPriority(LocationRequest.PRIORITY_LOW_POWER)
                 .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
                 .setFastestInterval(100 * 1000); // 100 seconds, in milliseconds
+        LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, new android.location.LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                mLastLocation = location;
+                refreshWithLocation();
+            }
 
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        }, null);
         return rootView;
     }
 
@@ -179,6 +201,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
     @Override
     public void onConnected(Bundle connectionHint) {
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
         refreshWithLocation();
     }
 
@@ -190,17 +214,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     }
 
     public void refreshWithLocation() {
-        if (!mGoogleApiClient.isConnected()){
-            mRefreshLayout.post(new Runnable() {
-                @Override
-                public void run() {
-                    mRefreshLayout.setRefreshing(false);
-                }
-            });
-            Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
-            return;
-        }
-        if (mLastLocation != null) {
+        if (mLastLocation != null && mGoogleApiClient.isConnected()) {
             Location newLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
             if (newLocation != null){
@@ -215,9 +229,11 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 }
             }
         }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient) != null ? LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient) : mLastLocation;
+        if (!mGoogleApiClient.isConnected()) {
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient) != null ? LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient) : mLastLocation;
+        }
         if (mLastLocation != null) {
             fetchTimesForDate("0");
         } else {
@@ -265,11 +281,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
     @Override
     public void onConnectionSuspended(int i) {
-//        LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
-//        mLastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//        if (mLastLocation != null){
-//            refreshWithLocation();
-//        }
     }
 
     public Location networkLocation(){
@@ -284,14 +295,20 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
-        mRefreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                mRefreshLayout.setRefreshing(false);
-            }
-        });
-
+        Log.d("Showtime", Build.MODEL);
+        if (Build.MODEL.contains("google_sdk") ||
+                Build.MODEL.contains("Emulator") ||
+                Build.MODEL.contains("Android SDK")) {
+            refreshWithLocation();
+        } else {
+            Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
+            mRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mRefreshLayout.setRefreshing(false);
+                }
+            });
+        }
     }
 
     private class MovieHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -418,7 +435,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         }
 
         public void cacheResults(List<Movie> results) throws IOException {
-            if (results != null) {
+            if (results != null && mCacheKey != null) {
                 List<Movie> movies = null;
                 File file = new File(mApplicationContext.getCacheDir(), mCacheKey);
                 FileOutputStream fos = new FileOutputStream(file);

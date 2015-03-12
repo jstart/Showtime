@@ -123,7 +123,29 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 .setPriority(LocationRequest.PRIORITY_LOW_POWER)
                 .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
                 .setFastestInterval(100 * 1000); // 100 second, in milliseconds
+        LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, new android.location.LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                mLastLocation = location;
+                refreshWithLocation();
+            }
 
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        }, null);
         return rootView;
     }
 
@@ -163,6 +185,8 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
     @Override
     public void onConnected(Bundle connectionHint) {
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
         refreshWithLocation();
     }
 
@@ -179,17 +203,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     }
 
     public void refreshWithLocation() {
-        if (!mGoogleApiClient.isConnected()){
-            mRefreshLayout.post(new Runnable() {
-                @Override
-                public void run() {
-                    mRefreshLayout.setRefreshing(false);
-                }
-            });
-            Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
-            return;
-        }
-        if (mLastLocation != null) {
+        if (mLastLocation != null && mGoogleApiClient.isConnected()) {
             Location newLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
             if (newLocation != null){
@@ -204,9 +218,11 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 }
             }
         }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient) != null ? LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient) : mLastLocation;
+        if (!mGoogleApiClient.isConnected()) {
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient) != null ? LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient) : mLastLocation;
+        }
         if (mLastLocation != null) {
             fetchTimesForDate("0");
         } else {
@@ -404,7 +420,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             }
 
             mCacheKey = "theaters_city_" + mCity + "_date_" + today.month + today.monthDay + today.year;
-
             Log.d("Showtime", mCacheKey);
             try {
                 theaters = cachedResultsForKey(mCacheKey);
@@ -443,7 +458,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         }
 
         public void cacheResults(ArrayList<Theater> results) throws IOException {
-            if (results != null) {
+            if (results != null && mCacheKey != null) {
                 File file = new File(mApplicationContext.getCacheDir(), mCacheKey);
                 FileOutputStream fos = new FileOutputStream(file);
                 ObjectOutputStream os = new ObjectOutputStream(fos);
