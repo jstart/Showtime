@@ -237,7 +237,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                 // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                 // Make the Intent explicit by setting the Google Maps package
-                mapIntent.setPackage("com.google.android.apps.maps");
+//                mapIntent.setPackage("com.google.android.apps.maps");
                 // Attempt to start an activity that can handle the Intent
                 if (mapIntent.resolveActivity(mApplicationContext.getPackageManager()) != null) {
                     startActivity(mapIntent);
@@ -377,7 +377,6 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
             Time today = new Time(Time.getCurrentTimezone());
             today.setToNow();
             mCacheKey = mMovie.id + mCity + today.month + today.monthDay + today.year;
-            String result = null;
             Movie movie = null;
             try {
                 movie = cachedResultsForKey(mCacheKey);

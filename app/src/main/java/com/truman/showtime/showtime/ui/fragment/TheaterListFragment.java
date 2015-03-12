@@ -18,6 +18,7 @@ package com.truman.showtime.showtime.ui.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
+import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
@@ -45,6 +46,7 @@ import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -117,14 +119,23 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mTheaterAdapter);
 
-        buildGoogleApiClient();
-        mGoogleApiClient.connect();
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(mApplicationContext) == ConnectionResult.SUCCESS){
+            buildGoogleApiClient();
+            mGoogleApiClient.connect();
+        }
+
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_LOW_POWER)
                 .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
-                .setFastestInterval(100 * 1000); // 100 second, in milliseconds
+                .setFastestInterval(100 * 1000); // 100 seconds, in milliseconds
         LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, new android.location.LocationListener() {
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+        String provider = locationManager.getBestProvider(criteria, true);
+        if(provider == null){
+            return rootView;
+        }
+        locationManager.requestSingleUpdate(provider, new android.location.LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 mLastLocation = location;
@@ -231,10 +242,13 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                     Build.MODEL.contains("Android SDK")) {
                 ShowtimeAPITask api = new ShowtimeAPITask();
                 api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
-            } else if (networkLocation() != null) {
+            }else if (mLastLocation != null) {
+                fetchTimesForDate("0");
+            }
+            else if (networkLocation() != null) {
                 mLastLocation = networkLocation();
                 fetchTimesForDate("0");
-            } else {
+            }else {
                 LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
                 mRefreshLayout.post(new Runnable() {
                     @Override
@@ -266,7 +280,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                 mapIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
                 // Make the Intent explicit by setting the Google Maps package
-                mapIntent.setPackage("com.google.android.apps.maps");
+//                mapIntent.setPackage("com.google.android.apps.maps");
                 // Attempt to start an activity that can handle the Intent
                 if (mapIntent.resolveActivity(mApplicationContext.getPackageManager()) != null) {
                     startActivity(mapIntent);
