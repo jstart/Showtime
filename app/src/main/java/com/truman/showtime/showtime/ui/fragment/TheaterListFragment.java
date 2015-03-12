@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -165,6 +166,18 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         refreshWithLocation();
     }
 
+    public Location networkLocation(){
+        LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+    }
+
+    public void fetchTimesForDate(String date) {
+        ShowtimeAPITask api = new ShowtimeAPITask();
+        String lat = String.valueOf(mLastLocation.getLatitude());
+        String lon = String.valueOf(mLastLocation.getLongitude());
+        api.execute(lat, lon, date);
+    }
+
     public void refreshWithLocation() {
         if (!mGoogleApiClient.isConnected()){
             mRefreshLayout.post(new Runnable() {
@@ -195,17 +208,16 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 mGoogleApiClient) != null ? LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient) : mLastLocation;
         if (mLastLocation != null) {
-            ShowtimeAPITask api = new ShowtimeAPITask();
-            String lat = String.valueOf(mLastLocation.getLatitude());
-            String lon = String.valueOf(mLastLocation.getLongitude());
-
-            api.execute(lat, lon, "0");
+            fetchTimesForDate("0");
         } else {
             if (Build.MODEL.contains("google_sdk") ||
                     Build.MODEL.contains("Emulator") ||
                     Build.MODEL.contains("Android SDK")) {
                 ShowtimeAPITask api = new ShowtimeAPITask();
                 api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
+            } else if (networkLocation() != null) {
+                mLastLocation = networkLocation();
+                fetchTimesForDate("0");
             } else {
                 LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
                 mRefreshLayout.post(new Runnable() {

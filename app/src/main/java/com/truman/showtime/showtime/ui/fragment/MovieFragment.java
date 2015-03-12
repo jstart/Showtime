@@ -437,7 +437,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         }
 
         public void parseAndReloadResults(Movie movie){
-            if (movie != null) {
+            if (movie != null && movie.theaters != null) {
                 if (movie.theaters.size() > 0){
                     mTheaterAdapter.notifyDataSetChanged();
                     if (mProgressBar.getParent() != null) {
