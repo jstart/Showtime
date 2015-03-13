@@ -184,8 +184,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     @Override
     public void onPause() {
         super.onPause();
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(mApplicationContext) == ConnectionResult.SUCCESS) {
-            buildGoogleApiClient();
+        if (mGoogleApiClient != null) {
             if (mGoogleApiClient.isConnected()) {
                 LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
                 mGoogleApiClient.disconnect();
