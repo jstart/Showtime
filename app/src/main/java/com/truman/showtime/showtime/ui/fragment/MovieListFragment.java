@@ -126,35 +126,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
                 .setFastestInterval(100 * 1000); // 100 seconds, in milliseconds
         LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-        String provider = locationManager.getBestProvider(criteria, true);
-        if(provider == null){
-            refreshWithLocation();
-            return rootView;
-        }
-        locationManager.requestSingleUpdate(provider, new android.location.LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                mLastLocation = location;
-                refreshWithLocation();
-            }
 
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        }, null);
+        refreshWithLocation();
         return rootView;
     }
 

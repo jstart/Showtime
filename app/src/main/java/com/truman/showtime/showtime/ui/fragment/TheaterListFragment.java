@@ -128,36 +128,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 .setPriority(LocationRequest.PRIORITY_LOW_POWER)
                 .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
                 .setFastestInterval(100 * 1000); // 100 seconds, in milliseconds
-        LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-        String provider = locationManager.getBestProvider(criteria, true);
-        if(provider == null){
-            refreshWithLocation();
-            return rootView;
-        }
-        locationManager.requestSingleUpdate(provider, new android.location.LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                mLastLocation = location;
-                refreshWithLocation();
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        }, null);
+        refreshWithLocation();
         return rootView;
     }
 
@@ -251,16 +222,15 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient) != null ? LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient) : mLastLocation;
-        }
-        if (mLastLocation != null) {
-            fetchTimesForDate("0");
-        } else {
-            if (Build.MODEL.contains("google_sdk") ||
+        }if (Build.MODEL.contains("google_sdk") ||
                     Build.MODEL.contains("Emulator") ||
                     Build.MODEL.contains("Android SDK")) {
-                ShowtimeAPITask api = new ShowtimeAPITask();
-                api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
-            }else if (mLastLocation != null) {
+            ShowtimeAPITask api = new ShowtimeAPITask();
+            api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
+        }else if (mLastLocation != null) {
+            fetchTimesForDate("0");
+        } else {
+            if (mLastLocation != null) {
                 fetchTimesForDate("0");
             }
             else if (networkLocation() != null) {
