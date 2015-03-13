@@ -214,7 +214,14 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
     public Location networkLocation(){
         LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
-        return locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Location network = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Location GPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (network != null){
+            return network;
+        }else if (GPS != null) {
+            return GPS;
+        }
+        return GPS;
     }
 
     public void fetchTimesForDate(String date) {
@@ -260,7 +267,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 mLastLocation = networkLocation();
                 fetchTimesForDate("0");
             }else {
-                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
                 mRefreshLayout.post(new Runnable() {
                     @Override
                     public void run() {

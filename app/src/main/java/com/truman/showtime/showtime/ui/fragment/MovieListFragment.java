@@ -271,7 +271,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 mLastLocation = networkLocation();
                 fetchTimesForDate("0");
             } else {
-                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
                     mRefreshLayout.post(new Runnable() {
                         @Override
                         public void run() {
@@ -310,7 +309,14 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
     public Location networkLocation(){
         LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
-        return locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Location network = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Location GPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (network != null){
+            return network;
+        }else if (GPS != null) {
+            return GPS;
+        }
+        return GPS;
     }
 
     @Override
