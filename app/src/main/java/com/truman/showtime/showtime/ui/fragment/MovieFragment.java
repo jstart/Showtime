@@ -358,7 +358,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
 
         @Override
         public int getItemCount() {
-            return mMovie.theaters.size() + 1;
+            return mMovie.theaters != null ? mMovie.theaters.size() + 1 : 0;
         }
 
         @Override
