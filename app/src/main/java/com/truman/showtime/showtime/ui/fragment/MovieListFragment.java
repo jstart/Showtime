@@ -130,6 +130,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         criteria.setAccuracy(Criteria.ACCURACY_COARSE);
         String provider = locationManager.getBestProvider(criteria, true);
         if(provider == null){
+            refreshWithLocation();
             return rootView;
         }
         locationManager.requestSingleUpdate(provider, new android.location.LocationListener() {
@@ -180,9 +181,12 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     @Override
     public void onPause() {
         super.onPause();
-        if (mGoogleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-            mGoogleApiClient.disconnect();
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(mApplicationContext) == ConnectionResult.SUCCESS) {
+            buildGoogleApiClient();
+            if (mGoogleApiClient.isConnected()) {
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+                mGoogleApiClient.disconnect();
+            }
         }
     }
 
@@ -215,9 +219,12 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        if (mGoogleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(
-                    mGoogleApiClient, mLocationRequest, this);
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(mApplicationContext) == ConnectionResult.SUCCESS) {
+            buildGoogleApiClient();
+            if (mGoogleApiClient.isConnected()) {
+                LocationServices.FusedLocationApi.requestLocationUpdates(
+                        mGoogleApiClient, mLocationRequest, this);
+            }
         }
         refreshWithLocation();
     }
@@ -230,7 +237,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     }
 
     public void refreshWithLocation() {
-
         if (mGoogleApiClient != null && mLastLocation != null && mGoogleApiClient.isConnected()) {
             Location newLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
@@ -408,7 +414,9 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(new Double(lat), new Double(lon), 1);
-                mCity = URLEncoder.encode(addresses.get(0).getLocality() + " " + addresses.get(0).getAdminArea(), "UTF-8");
+                if (addresses.size() > 0) {
+                    mCity = URLEncoder.encode(addresses.get(0).getLocality() + " " + addresses.get(0).getAdminArea(), "UTF-8");
+                }
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             } catch (IOException e){
