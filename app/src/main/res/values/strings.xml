@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Showtimes</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">Movie Times</string>
     <string name="action_refresh">Refresh</string>
     <string name="movies_tab_title">Movies</string>
     <string name="theaters_tab_title">Theaters</string>

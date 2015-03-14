@@ -438,7 +438,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
             if (movie != null && movie.theaters != null) {
                 if (movie.theaters.size() > 0){
                     mTheaterAdapter.notifyDataSetChanged();
-                    if (mProgressBar.getParent() != null) {
+                    if (mProgressBar.getParent() != null && mProgressBar != null) {
                         ((LinearLayout) mProgressBar.getParent()).removeView(mProgressBar);
                     }
                     mDescriptionView.setAlpha(1);
@@ -446,7 +446,6 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                     mShowtimesTitleView.setAlpha(1);
                     mSeparatorView.setAlpha(1);
                     if (mMovie.poster != null) {
-                        Picasso.with(mApplicationContext).setLoggingEnabled(true);
                         Picasso.with(mApplicationContext).load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
                     }
                 } else {
