@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">"영화 시간"</string>
+    <string name="action_refresh">"새로 고침"</string>
+    <string name="movies_tab_title">"동영상"</string>
+    <string name="theaters_tab_title">"극장"</string>
+    <string name="location_services_disabled">"위치 서비스는 비활성화"</string>
+    <string name="no_movies_found">"어떤 영화를 찾을 수 없습니다"</string>
+    <string name="showtimes_nearby_title">"상영 시간표 근처"</string>
+    <string name="movie_details_error">"영화 상세 정보를 찾을 수 없음"</string>
+    <string name="theaters_not_found">"어떤 극장을 찾을 수 없음"</string>
+    <string name="share_showtimes">"공유 상영 시간표"</string>
+    <string name="buy_tickets">"티켓 구매"</string>
+    <string name="directions_theater">"극장 오시는 길"</string>
+    <string name="share_theater">"공유 극장"</string>
+    <string name="share_movie">"공유 영화"</string>
+    <string name="today">"오늘"</string>
+    <string name="select_day">"상영 시간표를 위해 날짜를 선택"</string>
+</resources>

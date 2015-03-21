@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">"मूवी टाइम्स"</string>
+    <string name="action_refresh">"ताज़ा करना"</string>
+    <string name="movies_tab_title">"चलचित्र"</string>
+    <string name="theaters_tab_title">"थियेटर"</string>
+    <string name="location_services_disabled">"स्थान सेवा को निष्क्रिय"</string>
+    <string name="no_movies_found">"कोई मूवी नहीं मिला"</string>
+    <string name="showtimes_nearby_title">"प्रसारण समय पास में"</string>
+    <string name="movie_details_error">"मूवी विवरण नहीं मिला"</string>
+    <string name="theaters_not_found">"कोई थियेटर मिला"</string>
+    <string name="share_showtimes">"शेयर शोटाइम"</string>
+    <string name="buy_tickets">"टिकट खरीदना"</string>
+    <string name="directions_theater">"थियेटर करने के लिए दिशा-निर्देश"</string>
+    <string name="share_theater">"शेयर थियेटर"</string>
+    <string name="share_movie">"शेयर मूवी"</string>
+    <string name="today">"टुडे"</string>
+    <string name="select_day">"प्रसारण समय के लिए दिन का चयन"</string>
+</resources>

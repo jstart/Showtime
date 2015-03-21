@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">"Movie Times"</string>
+    <string name="action_refresh">"Làm mới"</string>
+    <string name="movies_tab_title">"Phim"</string>
+    <string name="theaters_tab_title">"Rạp"</string>
+    <string name="location_services_disabled">"Địa điểm Dịch vụ tàn tật"</string>
+    <string name="no_movies_found">"Không tìm thấy phim"</string>
+    <string name="showtimes_nearby_title">"Lịch chiếu lân cận"</string>
+    <string name="movie_details_error">"Movie Chi tiết Không tìm thấy"</string>
+    <string name="theaters_not_found">"Không có Nhà hát Found"</string>
+    <string name="share_showtimes">"Share Lịch chiếu"</string>
+    <string name="buy_tickets">"Mua Vé"</string>
+    <string name="directions_theater">"Chỉ đường đến Nhà hát"</string>
+    <string name="share_theater">"Chia sẻ Theater"</string>
+    <string name="share_movie">"Share Movie"</string>
+    <string name="today">"Ngày nay"</string>
+    <string name="select_day">"Chọn ngày cho Lịch chiếu"</string>
+</resources>
