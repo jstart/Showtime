@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">"Kinoprogramme"</string>
+    <string name="action_refresh">"Erfrischen"</string>
+    <string name="movies_tab_title">"Kino"</string>
+    <string name="theaters_tab_title">"Theater"</string>
+    <string name="location_services_disabled">"Ortungsdienste deaktiviert"</string>
+    <string name="no_movies_found">"Keine Filme gefunden"</string>
+    <string name="showtimes_nearby_title">"Wann &amp; Wo? In der Nähe"</string>
+    <string name="movie_details_error">"Filmdetails nicht gefunden"</string>
+    <string name="theaters_not_found">"Kein Theater gefunden"</string>
+    <string name="share_showtimes">"Teilen Wann &amp; Wo?"</string>
+    <string name="buy_tickets">"Tickets kaufen"</string>
+    <string name="directions_theater">"Anfahrt zum Theater"</string>
+    <string name="share_theater">"Teilen Theater"</string>
+    <string name="share_movie">"Teilen Film"</string>
+    <string name="today">"Heute"</string>
+    <string name="select_day">"Wählen Sie Tag für Wann &amp; Wo?"</string>
+</resources>

@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">"Фильм Времена"</string>
+    <string name="action_refresh">"Обновление"</string>
+    <string name="movies_tab_title">"Кино"</string>
+    <string name="theaters_tab_title">"Театры"</string>
+    <string name="location_services_disabled">"Место Услуги для инвалидов"</string>
+    <string name="no_movies_found">"Нет Фильмы не найдены"</string>
+    <string name="showtimes_nearby_title">"Сеансы рядом"</string>
+    <string name="movie_details_error">"Подробная информация о фильме не найдена"</string>
+    <string name="theaters_not_found">"Нет Театры не найдены"</string>
+    <string name="share_showtimes">"Поделиться Сеансы"</string>
+    <string name="buy_tickets">"Купить билеты"</string>
+    <string name="directions_theater">"Как добраться до театра"</string>
+    <string name="share_theater">"Поделиться театр"</string>
+    <string name="share_movie">"Доля Кино"</string>
+    <string name="today">"Сегодня"</string>
+    <string name="select_day">"Выберите день для сеансов"</string>
+</resources>

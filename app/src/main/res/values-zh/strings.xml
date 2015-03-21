@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">"电影放映时间"</string>
+    <string name="action_refresh">"刷新"</string>
+    <string name="movies_tab_title">"电影"</string>
+    <string name="theaters_tab_title">"剧院"</string>
+    <string name="location_services_disabled">"位置服务残疾"</string>
+    <string name="no_movies_found">"没有发现电影"</string>
+    <string name="showtimes_nearby_title">"附近的放映时间"</string>
+    <string name="movie_details_error">"电影细节未找到"</string>
+    <string name="theaters_not_found">"没有发现剧场"</string>
+    <string name="share_showtimes">"分享场次"</string>
+    <string name="buy_tickets">"购买门票"</string>
+    <string name="directions_theater">"路线剧院"</string>
+    <string name="share_theater">"分享剧院"</string>
+    <string name="share_movie">"分享电影"</string>
+    <string name="today">"今天"</string>
+    <string name="select_day">"选择日放映时间"</string>
+</resources>

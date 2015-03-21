@@ -449,11 +449,15 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                         Picasso.with(mApplicationContext).load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
                     }
                 } else {
-                    ((LinearLayout)mProgressBar.getParent()).removeView(mProgressBar);
+                    if (mProgressBar.getParent() != null && mProgressBar != null) {
+                        ((LinearLayout) mProgressBar.getParent()).removeView(mProgressBar);
+                    }
                     Toast.makeText(mApplicationContext, getString(R.string.movie_details_error), Toast.LENGTH_LONG).show();
                 }
             } else {
-                ((LinearLayout)mProgressBar.getParent()).removeView(mProgressBar);
+                if (mProgressBar.getParent() != null && mProgressBar != null) {
+                    ((LinearLayout) mProgressBar.getParent()).removeView(mProgressBar);
+                }
                 Toast.makeText(mApplicationContext, getString(R.string.movie_details_error), Toast.LENGTH_LONG).show();
             }
         }

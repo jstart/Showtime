@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">"映画タイムズ"</string>
+    <string name="action_refresh">"リフレッシュ"</string>
+    <string name="movies_tab_title">"ムービー"</string>
+    <string name="theaters_tab_title">"映画館"</string>
+    <string name="location_services_disabled">"位置情報サービス無効"</string>
+    <string name="no_movies_found">"作品が見つかりません"</string>
+    <string name="showtimes_nearby_title">"近くの上映時間"</string>
+    <string name="movie_details_error">"作品詳細が見つかりません"</string>
+    <string name="theaters_not_found">"映画館が見つかりません"</string>
+    <string name="share_showtimes">"シェア上映時間"</string>
+    <string name="buy_tickets">"チケット購入"</string>
+    <string name="directions_theater">"劇場への道順"</string>
+    <string name="share_theater">"シェアシアター"</string>
+    <string name="share_movie">"シェアムービー"</string>
+    <string name="today">"今日"</string>
+    <string name="select_day">"上映時間のための日を選択"</string>
+</resources>

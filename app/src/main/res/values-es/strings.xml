@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">"Horarios de cine"</string>
+    <string name="action_refresh">"Refrescar"</string>
+    <string name="movies_tab_title">"Cine"</string>
+    <string name="theaters_tab_title">"Teatros"</string>
+    <string name="location_services_disabled">"Ubicación para minusválidos"</string>
+    <string name="no_movies_found">"No hay películas encontradas"</string>
+    <string name="showtimes_nearby_title">"Cartelera cercano"</string>
+    <string name="movie_details_error">"Detalles de la película no encontrada"</string>
+    <string name="theaters_not_found">"No se han encontrado Teatros"</string>
+    <string name="share_showtimes">"Compartir Cartelera"</string>
+    <string name="buy_tickets">"Comprar entradas"</string>
+    <string name="directions_theater">"Cómo llegar a Teatro"</string>
+    <string name="share_theater">"Compartir Teatro"</string>
+    <string name="share_movie">"Compartir Movie"</string>
+    <string name="today">"Hoy"</string>
+    <string name="select_day">"Seleccione el día de Sesiones"</string>
+</resources>

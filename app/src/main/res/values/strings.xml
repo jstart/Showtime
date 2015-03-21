@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Movie Times</string>
     <string name="action_refresh">Refresh</string>
     <string name="movies_tab_title">Movies</string>
@@ -17,5 +16,4 @@
     <string name="share_movie">Share Movie</string>
     <string name="today">Today</string>
     <string name="select_day">Select Day for Showtimes</string>
-
 </resources>

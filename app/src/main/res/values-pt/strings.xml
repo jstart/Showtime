@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">"Dos tempos de filme"</string>
+    <string name="action_refresh">"Refrescar"</string>
+    <string name="movies_tab_title">"Filmes"</string>
+    <string name="theaters_tab_title">"Theaters"</string>
+    <string name="location_services_disabled">"Serviços de Localização para deficientes"</string>
+    <string name="no_movies_found">"Não há filmes encontrados"</string>
+    <string name="showtimes_nearby_title">"Horários de exibição nas proximidades"</string>
+    <string name="movie_details_error">"Detalhes do Filme não encontrado"</string>
+    <string name="theaters_not_found">"Nenhum Theaters Encontrado"</string>
+    <string name="share_showtimes">"Compartilhar Showtimes"</string>
+    <string name="buy_tickets">"Comprar ingressos"</string>
+    <string name="directions_theater">"Como chegar em Theater"</string>
+    <string name="share_theater">"Compartilhar Theater"</string>
+    <string name="share_movie">"Partilhar Filmes"</string>
+    <string name="today">"Hoje"</string>
+    <string name="select_day">"Selecione o dia para Showtimes"</string>
+</resources>

@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">"فيلم تايمز"</string>
+    <string name="action_refresh">"التحديث"</string>
+    <string name="movies_tab_title">"أفلام"</string>
+    <string name="theaters_tab_title">"المسارح"</string>
+    <string name="location_services_disabled">"موقع خدمات المعاقين"</string>
+    <string name="no_movies_found">"يوجد أفلام تم العثور عليها"</string>
+    <string name="showtimes_nearby_title">"أوقات العرض في مكان قريب"</string>
+    <string name="movie_details_error">"تفاصيل الفيلم لم يتم العثور على"</string>
+    <string name="theaters_not_found">"لا المسارح العثور"</string>
+    <string name="share_showtimes">"حصة أوقات العرض"</string>
+    <string name="buy_tickets">"شراء تذاكر"</string>
+    <string name="directions_theater">"توجيهات إلى مسرح"</string>
+    <string name="share_theater">"حصة المسرح"</string>
+    <string name="share_movie">"سهم السينما"</string>
+    <string name="today">"اليوم"</string>
+    <string name="select_day">"تحديد يوم لأوقات العرض"</string>
+</resources>
