@@ -5,19 +5,37 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <compatible-screens>
-        <screen android:screenSize="small" android:screenDensity="ldpi" />
-        <screen android:screenSize="small" android:screenDensity="mdpi" />
-        <screen android:screenSize="small" android:screenDensity="hdpi" />
-        <screen android:screenSize="small" android:screenDensity="xhdpi" />
-        <screen android:screenSize="small" android:screenDensity="480" />
-        <!-- all normal size screens -->
-        <screen android:screenSize="normal" android:screenDensity="ldpi" />
-        <screen android:screenSize="normal" android:screenDensity="mdpi" />
-        <screen android:screenSize="normal" android:screenDensity="hdpi" />
-        <screen android:screenSize="normal" android:screenDensity="xhdpi" />
-        <screen android:screenSize="normal" android:screenDensity="480" />
-    </compatible-screens>
+    <!--<compatible-screens>-->
+        <!--<screen android:screenSize="small" android:screenDensity="ldpi" />-->
+        <!--<screen android:screenSize="small" android:screenDensity="mdpi" />-->
+        <!--<screen android:screenSize="small" android:screenDensity="hdpi" />-->
+        <!--<screen android:screenSize="small" android:screenDensity="xhdpi" />-->
+        <!--<screen android:screenSize="small" android:screenDensity="480" />-->
+        <!--&lt;!&ndash; all normal size screens &ndash;&gt;-->
+        <!--<screen android:screenSize="normal" android:screenDensity="ldpi" />-->
+        <!--<screen android:screenSize="normal" android:screenDensity="mdpi" />-->
+        <!--<screen android:screenSize="normal" android:screenDensity="hdpi" />-->
+        <!--<screen android:screenSize="normal" android:screenDensity="xhdpi" />-->
+        <!--<screen android:screenSize="normal" android:screenDensity="xxhdpi" />-->
+        <!--<screen android:screenSize="normal" android:screenDensity="xxxhdpi" />-->
+        <!--<screen android:screenSize="normal" android:screenDensity="480" />-->
+
+        <!--<screen android:screenSize="large" android:screenDensity="ldpi" />-->
+        <!--<screen android:screenSize="large" android:screenDensity="mdpi" />-->
+        <!--<screen android:screenSize="large" android:screenDensity="hdpi" />-->
+        <!--<screen android:screenSize="large" android:screenDensity="xhdpi" />-->
+        <!--<screen android:screenSize="large" android:screenDensity="xxhdpi" />-->
+        <!--<screen android:screenSize="large" android:screenDensity="xxxhdpi" />-->
+        <!--<screen android:screenSize="large" android:screenDensity="480" />-->
+
+        <!--<screen android:screenSize="xlarge" android:screenDensity="ldpi" />-->
+        <!--<screen android:screenSize="xlarge" android:screenDensity="mdpi" />-->
+        <!--<screen android:screenSize="xlarge" android:screenDensity="hdpi" />-->
+        <!--<screen android:screenSize="xlarge" android:screenDensity="xhdpi" />-->
+        <!--<screen android:screenSize="xlarge" android:screenDensity="xxhdpi" />-->
+        <!--<screen android:screenSize="xlarge" android:screenDensity="xxxhdpi" />-->
+        <!--<screen android:screenSize="xlarge" android:screenDensity="480" />-->
+    <!--</compatible-screens>-->
     <application
         android:name=".application.ShowtimeApplication"
         android:allowBackup="true"

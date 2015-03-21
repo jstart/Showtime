@@ -53,6 +53,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.truman.showtime.showtime.R;
+import com.truman.showtime.showtime.models.Theater;
 import com.truman.showtime.showtime.service.ShowtimeService;
 import com.truman.showtime.showtime.ui.view.SimpleDividerItemDecoration;
 import com.truman.showtime.showtime.models.Movie;
@@ -409,9 +410,16 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             } catch (IOException e){
                 e.printStackTrace();
             }
-            mCacheKey = "movies_city_" + mCity + "_date_" + today.month + today.monthDay + today.year;
-            String result = null;
             List<Movie> movies = null;
+
+            if (mCity == null && isNetworkAvailable()) {
+                mShowtimeService = ShowtimeService.adapter();
+                movies = mShowtimeService.listMovies(lat, lon, date, "");
+                return movies;
+            }
+
+            mCacheKey = "movies_city_" + mCity + "_date_" + today.month + today.monthDay + today.year;
+
             Log.d("Showtime", mCacheKey);
             try {
                 movies = cachedResultsForKey(mCacheKey);

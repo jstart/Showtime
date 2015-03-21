@@ -425,7 +425,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
             ArrayList<Theater> theaters = null;
 
-            if (mCity == null) {
+            if (mCity == null && isNetworkAvailable()) {
                 mShowtimeService = ShowtimeService.adapter();
                 theaters = mShowtimeService.listTheaters(lat, lon, date, "");
                 return theaters;
