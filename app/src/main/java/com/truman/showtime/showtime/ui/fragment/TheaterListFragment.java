@@ -22,6 +22,8 @@ import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -200,6 +202,13 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         String lat = String.valueOf(mLastLocation.getLatitude());
         String lon = String.valueOf(mLastLocation.getLongitude());
         api.execute(lat, lon, date);
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) mApplicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     public void refreshWithLocation() {
@@ -436,7 +445,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 Log.d("Showtime", "theaters class not found miss");
             }
 
-            if (theaters == null) {
+            if (theaters == null && isNetworkAvailable()) {
                 mShowtimeService = ShowtimeService.adapter();
                 theaters = mShowtimeService.listTheaters(lat, lon, date, mCity);
             }

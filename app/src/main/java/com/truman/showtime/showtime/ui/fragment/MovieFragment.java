@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -194,6 +196,13 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
             Picasso.with(mApplicationContext).setLoggingEnabled(true);
             Picasso.with(mApplicationContext).load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
         }
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) mApplicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     @Override
@@ -387,7 +396,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                 Log.d("Showtime", "movies class not found miss");
             }
 
-            if (movie == null) {
+            if (movie == null && isNetworkAvailable()) {
                 movie = mShowtimeService.movieDetails(mMovie.id, mLat, mLon, "0", mCity);
             }
 

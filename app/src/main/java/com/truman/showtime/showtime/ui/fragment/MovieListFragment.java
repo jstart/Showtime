@@ -22,6 +22,8 @@ import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -199,6 +201,13 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             }
         }
         refreshWithLocation();
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) mApplicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     public void fetchTimesForDate(String date) {
@@ -416,7 +425,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 Log.d("Showtime", "movies class not found miss");
             }
 
-            if (movies == null) {
+            if (movies == null && isNetworkAvailable()) {
                 mShowtimeService = ShowtimeService.adapter();
                 movies = mShowtimeService.listMovies(lat, lon, date, mCity);
             }
