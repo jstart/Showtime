@@ -130,6 +130,38 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 .setPriority(LocationRequest.PRIORITY_LOW_POWER)
                 .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
                 .setFastestInterval(100 * 1000); // 100 seconds, in milliseconds
+
+        final LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+        String provider = locationManager.getBestProvider(criteria, true);
+        if(provider == null){
+            refreshWithLocation();
+            return rootView;
+        }
+        locationManager.requestSingleUpdate(provider, new android.location.LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                mLastLocation = location;
+                refreshWithLocation();
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+                locationManager.requestSingleUpdate(provider, this, null);
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        }, null);
+
         refreshWithLocation();
         return rootView;
     }
@@ -194,7 +226,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         }else if (GPS != null) {
             return GPS;
         }
-        return GPS;
+        return null;
     }
 
     public void fetchTimesForDate(String date) {
@@ -274,7 +306,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
                 Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + theaterString);
                 // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
                 // Make the Intent explicit by setting the Google Maps package
 //                mapIntent.setPackage("com.google.android.apps.maps");
                 // Attempt to start an activity that can handle the Intent
@@ -287,7 +318,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         } else if (item.getTitle().equals(getString(R.string.share_theater))){
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
             sendIntent.putExtra(Intent.EXTRA_TEXT, mSelectedTheater.name + "\n" + mSelectedTheater.address + "\n" + "http://google.com/movies?near=" + mCity + "&tid=" + mSelectedTheater.id);
 
             sendIntent.setType("text/plain");

@@ -128,8 +128,36 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 .setPriority(LocationRequest.PRIORITY_LOW_POWER)
                 .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
                 .setFastestInterval(100 * 1000); // 100 seconds, in milliseconds
-        LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
+        final LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+        String provider = locationManager.getBestProvider(criteria, true);
+        if(provider == null){
+            refreshWithLocation();
+            return rootView;
+        }
+        locationManager.requestSingleUpdate(provider, new android.location.LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                mLastLocation = location;
+                refreshWithLocation();
+            }
 
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+                locationManager.requestSingleUpdate(provider, this, null);
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        }, null);
         refreshWithLocation();
         return rootView;
     }
@@ -278,7 +306,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             AdapterViewCompat.AdapterContextMenuInfo info = (AdapterViewCompat.AdapterContextMenuInfo) item.getMenuInfo();
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
             sendIntent.putExtra(Intent.EXTRA_TEXT, mSelectedMovie.name + "\n" + "http://google.com/movies?near=" + mCity + "&mid=" + mSelectedMovie.id);
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_movie)));
@@ -299,7 +326,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         }else if (GPS != null) {
             return GPS;
         }
-        return GPS;
+        return null;
     }
 
     @Override
