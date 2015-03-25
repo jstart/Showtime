@@ -3,10 +3,6 @@ buildscript {
     repositories {
         mavenCentral() // or jcenter()
     }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.+'
-    }
 }
 
 allprojects {
