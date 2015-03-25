@@ -18,10 +18,8 @@ package com.truman.showtime.showtime.ui.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
-import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -46,18 +44,13 @@ import android.widget.Toast;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.truman.showtime.showtime.R;
-import com.truman.showtime.showtime.models.Theater;
-import com.truman.showtime.showtime.service.ShowtimeService;
-import com.truman.showtime.showtime.ui.view.SimpleDividerItemDecoration;
 import com.truman.showtime.showtime.models.Movie;
+import com.truman.showtime.showtime.service.ShowtimeService;
 import com.truman.showtime.showtime.ui.activity.DetailActivity;
+import com.truman.showtime.showtime.ui.view.SimpleDividerItemDecoration;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -71,7 +64,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MovieListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ObservableScrollViewCallbacks {
+public class MovieListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, ObservableScrollViewCallbacks {
     private MovieAdapter mMovieAdapter;
     private List<Movie> mMovieResults;
 
@@ -96,12 +89,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        mLastLocation = location;
-        refreshWithLocation();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mMovieResults = new ArrayList<Movie>();
@@ -119,46 +106,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mMovieAdapter);
 
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(mApplicationContext) == ConnectionResult.SUCCESS){
-            buildGoogleApiClient();
-            mGoogleApiClient.connect();
-        }
-
-        mLocationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_LOW_POWER)
-                .setInterval(1000 * 1000)        // 1000 seconds, in milliseconds
-                .setFastestInterval(100 * 1000); // 100 seconds, in milliseconds
-        final LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-        String provider = locationManager.getBestProvider(criteria, true);
-        if(provider == null){
-            refreshWithLocation();
-            return rootView;
-        }
-        locationManager.requestSingleUpdate(provider, new android.location.LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                mLastLocation = location;
-                refreshWithLocation();
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-                locationManager.requestSingleUpdate(provider, this, null);
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        }, null);
-        refreshWithLocation();
         return rootView;
     }
 
@@ -174,23 +121,11 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     @Override
     public void onResume() {
         super.onResume();
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(mApplicationContext) == ConnectionResult.SUCCESS){
-            buildGoogleApiClient();
-            if (!mGoogleApiClient.isConnecting()){
-                mGoogleApiClient.connect();
-            }
-        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (mGoogleApiClient != null) {
-            if (mGoogleApiClient.isConnected()) {
-                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-                mGoogleApiClient.disconnect();
-            }
-        }
     }
 
     @Override
@@ -212,26 +147,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 //        }
     }
 
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = mGoogleApiClient != null ? mGoogleApiClient : new GoogleApiClient.Builder(mApplicationContext)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(mApplicationContext) == ConnectionResult.SUCCESS) {
-            buildGoogleApiClient();
-            if (mGoogleApiClient.isConnected()) {
-                LocationServices.FusedLocationApi.requestLocationUpdates(
-                        mGoogleApiClient, mLocationRequest, this);
-            }
-        }
-        refreshWithLocation();
-    }
-
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) mApplicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -246,27 +161,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         api.execute(lat, lon, date);
     }
 
-    public void refreshWithLocation() {
-        if (mGoogleApiClient != null && mLastLocation != null && mGoogleApiClient.isConnected()) {
-            Location newLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient);
-            if (newLocation != null){
-                if (mLastLocation.getLatitude() == newLocation.getLatitude() && mLastLocation.getLongitude() == newLocation.getLongitude()){
-                    mRefreshLayout.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mRefreshLayout.setRefreshing(false);
-                        }
-                    });
-                    return;
-                }
-            }
-        }
-        if (mGoogleApiClient != null && !mGoogleApiClient.isConnected()) {
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient) != null ? LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient) : mLastLocation;
-        }
+    public void refreshWithLocation(Location location) {
+        mLastLocation = location;
         if (mLastLocation != null) {
             fetchTimesForDate("0");
         } else {
@@ -278,10 +174,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             }else if (mLastLocation != null) {
                 fetchTimesForDate("0");
             }
-            else if (networkLocation() != null) {
-                mLastLocation = networkLocation();
-                fetchTimesForDate("0");
-            } else {
+            else {
                     mRefreshLayout.post(new Runnable() {
                         @Override
                         public void run() {
@@ -314,42 +207,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
-    }
-
-    public Location networkLocation(){
-        LocationManager locationManager = (LocationManager) mApplicationContext.getSystemService(Context.LOCATION_SERVICE);
-        Location network = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        Location GPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (network != null){
-            return network;
-        }else if (GPS != null) {
-            return GPS;
-        }
-        return null;
-    }
-
-    @Override
     public void onRefresh() {
-        refreshWithLocation();
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.d("Showtime", Build.MODEL);
-        if (Build.MODEL.contains("google_sdk") ||
-                Build.MODEL.contains("Emulator") ||
-                Build.MODEL.contains("Android SDK")) {
-            refreshWithLocation();
-        } else {
-            Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
-            mRefreshLayout.post(new Runnable() {
-                @Override
-                public void run() {
-                    mRefreshLayout.setRefreshing(false);
-                }
-            });
-        }
+        refreshWithLocation(mLastLocation);
     }
 
     private class MovieHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {

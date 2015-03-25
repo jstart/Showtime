@@ -1,7 +1,8 @@
 package com.truman.showtime.showtime.ui.activity;
 
-import android.content.Intent;
 import android.graphics.Color;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,20 +10,26 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.widget.Toast;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
-import com.truman.showtime.showtime.ui.fragment.MovieListFragment;
 import com.truman.showtime.showtime.R;
-import com.truman.showtime.showtime.ui.view.SlidingTabLayout;
+import com.truman.showtime.showtime.ui.fragment.MovieListFragment;
 import com.truman.showtime.showtime.ui.fragment.TheaterListFragment;
+import com.truman.showtime.showtime.ui.view.SlidingTabLayout;
 
+import io.nlopez.smartlocation.OnLocationUpdatedListener;
+import io.nlopez.smartlocation.SmartLocation;
+import io.nlopez.smartlocation.location.providers.LocationGooglePlayServicesWithFallbackProvider;
 
 public class MainActivity extends ActionBarActivity {
     private ShowtimePagerAdapter mDemoCollectionPagerAdapter;
     private ViewPager mViewPager;
     private SlidingTabLayout mSlidingTabLayout;
     private MixpanelAPI mMixpanel;
+    private TheaterListFragment theaterListFragment;
+    private MovieListFragment movieListFragment;
+
     private static final String MIXPANEL_TOKEN = "a6131725e7cc0ba03dd1bb423f9ba65a";
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,12 +46,7 @@ public class MainActivity extends ActionBarActivity {
                         getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mDemoCollectionPagerAdapter);
-        mViewPager.setOnPageChangeListener(
-                new ViewPager.SimpleOnPageChangeListener() {
-                    @Override
-                    public void onPageSelected(int position) {
-                    }
-                });
+
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
         mSlidingTabLayout.setSelectedIndicatorColors(Color.WHITE);
@@ -56,6 +58,7 @@ public class MainActivity extends ActionBarActivity {
 
             @Override
             public void onPageSelected(int position) {
+                mMixpanel.track(String.valueOf(mDemoCollectionPagerAdapter.getPageTitle(position)), null);
                 mViewPager.setCurrentItem(position, true);
             }
 
@@ -63,17 +66,39 @@ public class MainActivity extends ActionBarActivity {
             public void onPageScrollStateChanged(int state) {
             }
         });
-        findViewById(R.id.pager).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, DetailActivity.class));
-            }
-        });
+
+        theaterListFragment = new TheaterListFragment();
+        movieListFragment = new MovieListFragment();
     }
 
     protected void onDestroy() {
         mMixpanel.flush();
         super.onDestroy();
+    }
+
+    protected void onPause() {
+        super.onPause();
+        SmartLocation.with(this).location().stop();
+    }
+
+    protected void onResume() {
+        super.onResume();
+
+        if (Build.MODEL.contains("google_sdk") ||
+                Build.MODEL.contains("Emulator") ||
+                Build.MODEL.contains("Android SDK")) {
+//            api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
+        }
+        SmartLocation.with(this).location().oneFix()
+                .provider(new LocationGooglePlayServicesWithFallbackProvider(this))
+                .start(new OnLocationUpdatedListener() {
+                    @Override
+                    public void onLocationUpdated(Location location) {
+                        theaterListFragment.refreshWithLocation(location);
+                        movieListFragment.refreshWithLocation(location);
+                        Toast.makeText(getApplicationContext(), location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     public class ShowtimePagerAdapter extends FragmentStatePagerAdapter {
@@ -85,10 +110,9 @@ public class MainActivity extends ActionBarActivity {
         public Fragment getItem(int i) {
             Fragment fragment;
             if (i == 1){
-                fragment = new MovieListFragment();
+                fragment = movieListFragment;
             }else {
-                fragment = new TheaterListFragment();
-
+                fragment = theaterListFragment;
             }
             return fragment;
         }
