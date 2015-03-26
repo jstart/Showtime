@@ -3,8 +3,6 @@ package com.truman.showtime.showtime.ui.fragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -43,10 +41,10 @@ import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.google.android.youtube.player.YouTubeIntents;
 import com.squareup.picasso.Picasso;
 import com.truman.showtime.showtime.R;
-import com.truman.showtime.showtime.service.ShowtimeService;
-import com.truman.showtime.showtime.ui.view.SimpleDividerItemDecoration;
 import com.truman.showtime.showtime.models.Movie;
 import com.truman.showtime.showtime.models.Theater;
+import com.truman.showtime.showtime.service.ShowtimeService;
+import com.truman.showtime.showtime.ui.view.SimpleDividerItemDecoration;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -394,7 +392,11 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
             }
 
             if (movie == null && isNetworkAvailable()) {
-                movie = mShowtimeService.movieDetails(mMovie.id, mLat, mLon, "0", mCity);
+                try {
+                    movie = mShowtimeService.movieDetails(mMovie.id, mLat, mLon, "0", mCity);
+                }catch(Exception e){
+
+                }
             }
 
             return movie;
@@ -407,7 +409,9 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
 
         @Override
         protected void onPostExecute(Movie movie) {
-            mMovie = movie;
+            if (movie != null){
+                mMovie = movie;
+            }
             try {
                 cacheResults(movie);
             } catch (IOException e) {

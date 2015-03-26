@@ -1,22 +1,32 @@
 package com.truman.showtime.showtime.ui.activity;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.truman.showtime.showtime.R;
 import com.truman.showtime.showtime.ui.fragment.MovieListFragment;
 import com.truman.showtime.showtime.ui.fragment.TheaterListFragment;
 import com.truman.showtime.showtime.ui.view.SlidingTabLayout;
+
+import java.io.IOException;
+import java.util.List;
 
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
@@ -29,6 +39,7 @@ public class MainActivity extends ActionBarActivity {
     private MixpanelAPI mMixpanel;
     private TheaterListFragment theaterListFragment;
     private MovieListFragment movieListFragment;
+    private SearchView mSearchView;
 
     private static final String MIXPANEL_TOKEN = "a6131725e7cc0ba03dd1bb423f9ba65a";
 
@@ -71,6 +82,54 @@ public class MainActivity extends ActionBarActivity {
         movieListFragment = new MovieListFragment();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchItem = menu.findItem(R.id.search);
+
+        mSearchView =
+                (SearchView) MenuItemCompat.getActionView(searchItem);
+        mSearchView.setQueryHint(getString(R.string.location_hint));
+        mSearchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                Geocoder geocoder = new Geocoder(getApplicationContext());
+                mSearchView.clearFocus();
+
+                List<Address> addresses = null;
+                try {
+                    addresses = geocoder.getFromLocationName(s, 1);
+                    if (addresses.size() > 0 && addresses.get(0).hasLatitude()) {
+                        Location location = new Location("");
+                        location.setLatitude(addresses.get(0).getLatitude());
+                        location.setLongitude(addresses.get(0).getLongitude());
+
+                        movieListFragment.refreshWithLocation(location);
+                        theaterListFragment.refreshWithLocation(location);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
+
+        return true;
+    }
+
     protected void onDestroy() {
         mMixpanel.flush();
         super.onDestroy();
@@ -83,12 +142,6 @@ public class MainActivity extends ActionBarActivity {
 
     protected void onResume() {
         super.onResume();
-
-        if (Build.MODEL.contains("google_sdk") ||
-                Build.MODEL.contains("Emulator") ||
-                Build.MODEL.contains("Android SDK")) {
-//            api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
-        }
         SmartLocation.with(this).location().oneFix()
                 .provider(new LocationGooglePlayServicesWithFallbackProvider(this))
                 .start(new OnLocationUpdatedListener() {
@@ -96,7 +149,7 @@ public class MainActivity extends ActionBarActivity {
                     public void onLocationUpdated(Location location) {
                         theaterListFragment.refreshWithLocation(location);
                         movieListFragment.refreshWithLocation(location);
-                        Toast.makeText(getApplicationContext(), location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_LONG).show();
                     }
                 });
     }

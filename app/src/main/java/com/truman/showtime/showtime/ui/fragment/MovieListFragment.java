@@ -112,7 +112,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mRefreshLayout.post(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 mRefreshLayout.setRefreshing(true);
             }
         });
@@ -161,8 +162,18 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         api.execute(lat, lon, date);
     }
 
+    public void searchZipcode(String zipcode){
+
+    }
+
     public void refreshWithLocation(Location location) {
         mLastLocation = location;
+        mRefreshLayout.post(new Runnable() {
+            @Override public void run() {
+                mRefreshLayout.setRefreshing(true);
+            }
+        });
+
         if (mLastLocation != null) {
             fetchTimesForDate("0");
         } else {
@@ -288,8 +299,13 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(new Double(lat), new Double(lon), 1);
+                addresses = geocoder.getFromLocation(new Double(lat), new Double(lon), 1);
                 if (addresses.size() > 0) {
-                    mCity = URLEncoder.encode(addresses.get(0).getLocality() + " " + addresses.get(0).getAdminArea(), "UTF-8");
+                    String address = addresses.get(0).getLocality();
+                    if (addresses.get(0).getAdminArea() != null){
+                        address += " " + addresses.get(0).getAdminArea();
+                    }
+                    mCity = URLEncoder.encode(address, "UTF-8");
                 }
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
@@ -300,7 +316,11 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
             if (mCity == null && isNetworkAvailable()) {
                 mShowtimeService = ShowtimeService.adapter();
-                movies = mShowtimeService.listMovies(lat, lon, date, "");
+                try{
+                    movies = mShowtimeService.listMovies(lat, lon, date, "");
+                }catch(Exception e){
+
+                }
                 return movies;
             }
 
@@ -321,7 +341,11 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
             if (movies == null && isNetworkAvailable()) {
                 mShowtimeService = ShowtimeService.adapter();
-                movies = mShowtimeService.listMovies(lat, lon, date, mCity);
+                try {
+                    movies = mShowtimeService.listMovies(lat, lon, date, mCity);
+                }catch(Exception e){
+
+                }
             }
 
             return movies;
@@ -334,7 +358,9 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         @Override
         protected void onPostExecute(List<Movie> results) {
-            mMovieResults = results;
+            if (results != null && results.size() > 0) {
+                mMovieResults = results;
+            }
             try {
                 cacheResults(results);
             } catch (IOException e) {
@@ -370,7 +396,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         }
 
         public void parseAndReloadResults(List<Movie> result){
-            if (result.size() > 0){
+            if (result != null && result.size() > 0){
                 mMovieAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
             } else {

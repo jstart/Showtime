@@ -16,4 +16,6 @@
     <string name="share_movie">Share Movie</string>
     <string name="today">Today</string>
     <string name="select_day">Select Day for Showtimes</string>
+    <string name="location_title" translatable="false">Change Location</string>
+    <string name="location_hint" translatable="false">Enter Zipcode</string>
 </resources>

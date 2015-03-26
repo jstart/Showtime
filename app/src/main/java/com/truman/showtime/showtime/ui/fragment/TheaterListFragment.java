@@ -63,7 +63,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import static com.truman.showtime.showtime.service.ShowtimeService.Showtimes;
 
@@ -146,8 +145,14 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     }
 
     public void refreshWithLocation(Location location) {
-       mLastLocation = location;
-       if (Build.MODEL.contains("google_sdk") ||
+        mLastLocation = location;
+        mRefreshLayout.post(new Runnable() {
+            @Override public void run() {
+                mRefreshLayout.setRefreshing(true);
+            }
+        });
+
+        if (Build.MODEL.contains("google_sdk") ||
                     Build.MODEL.contains("Emulator") ||
                     Build.MODEL.contains("Android SDK")) {
             ShowtimeAPITask api = new ShowtimeAPITask();
@@ -298,12 +303,16 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         protected ArrayList<Theater> getResponse(String lat, String lon, String date) {
             Time today = new Time(Time.getCurrentTimezone());
             today.setToNow();
-            Geocoder geocoder = new Geocoder(mApplicationContext, Locale.getDefault());
+            Geocoder geocoder = new Geocoder(mApplicationContext);
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(new Double(lat), new Double(lon), 1);
                 if (addresses.size() > 0) {
-                    mCity = URLEncoder.encode(addresses.get(0).getLocality() + " " + addresses.get(0).getAdminArea(), "UTF-8");
+                    String address = addresses.get(0).getLocality();
+                    if (addresses.get(0).getAdminArea() != null){
+                        address += " " + addresses.get(0).getAdminArea();
+                    }
+                    mCity = URLEncoder.encode(address, "UTF-8");
                 }
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
@@ -315,7 +324,11 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
             if (mCity == null && isNetworkAvailable()) {
                 mShowtimeService = ShowtimeService.adapter();
-                theaters = mShowtimeService.listTheaters(lat, lon, date, "");
+                try{
+                    theaters = mShowtimeService.listTheaters(lat, lon, date, "");
+                }catch(Exception e){
+
+                }
                 return theaters;
             }
 
@@ -335,7 +348,11 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
             if (theaters == null && isNetworkAvailable()) {
                 mShowtimeService = ShowtimeService.adapter();
-                theaters = mShowtimeService.listTheaters(lat, lon, date, mCity);
+                try{
+                    theaters = mShowtimeService.listTheaters(lat, lon, date, mCity);
+                }catch(Exception e){
+
+                }
             }
 
             return theaters;
@@ -348,7 +365,9 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
         @Override
         protected void onPostExecute(ArrayList<Theater> results) {
-            mTheaterResults = results;
+            if (results != null && results.size() > 0) {
+                mTheaterResults = results;
+            }
             try {
                 cacheResults(results);
             } catch (IOException e) {
@@ -382,7 +401,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         }
 
         public void parseAndReloadResults(ArrayList<Theater> result){
-            if (result.size() > 0){
+            if (result != null && result.size() > 0){
                 mTheaterAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
             } else {
