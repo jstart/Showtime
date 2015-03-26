@@ -40,6 +40,7 @@ public class MainActivity extends ActionBarActivity {
     private TheaterListFragment theaterListFragment;
     private MovieListFragment movieListFragment;
     private SearchView mSearchView;
+    private Location mLastLocation;
 
     private static final String MIXPANEL_TOKEN = "a6131725e7cc0ba03dd1bb423f9ba65a";
 
@@ -147,9 +148,12 @@ public class MainActivity extends ActionBarActivity {
                 .start(new OnLocationUpdatedListener() {
                     @Override
                     public void onLocationUpdated(Location location) {
-                        theaterListFragment.refreshWithLocation(location);
-                        movieListFragment.refreshWithLocation(location);
-//                        Toast.makeText(getApplicationContext(), location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_LONG).show();
+                        if (mLastLocation == null || (mLastLocation.getLatitude() != location.getLatitude()
+                                && mLastLocation.getLongitude() != location.getLongitude())) {
+                            mLastLocation = location;
+                            theaterListFragment.refreshWithLocation(location);
+                            movieListFragment.refreshWithLocation(location);
+                        }
                     }
                 });
     }

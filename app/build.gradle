@@ -28,7 +28,7 @@ android {
         applicationId 'com.truman.showtime.showtime'
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 10
+        versionCode 11
         versionName '1.0'
     }
     signingConfigs {
