@@ -191,6 +191,8 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         if (mMovie.poster != null) {
             Picasso.with(mApplicationContext).setLoggingEnabled(true);
             Picasso.with(mApplicationContext).load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
+        }else {
+            mHeroImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
         }
     }
 

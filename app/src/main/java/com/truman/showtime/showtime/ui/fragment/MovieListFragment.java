@@ -158,10 +158,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         api.execute(lat, lon, date);
     }
 
-    public void searchZipcode(String zipcode){
-
-    }
-
     public void refreshWithLocation(Location location) {
         mLastLocation = location;
         mRefreshLayout.post(new Runnable() {
