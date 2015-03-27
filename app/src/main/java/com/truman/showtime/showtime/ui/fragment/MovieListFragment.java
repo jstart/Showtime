@@ -44,8 +44,6 @@ import android.widget.Toast;
 import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
 import com.truman.showtime.showtime.R;
 import com.truman.showtime.showtime.models.Movie;
 import com.truman.showtime.showtime.service.ShowtimeService;
@@ -71,10 +69,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     private SwipeRefreshLayout mRefreshLayout;
     private ObservableRecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
-    private GoogleApiClient mGoogleApiClient;
     private ShowtimeService.Showtimes mShowtimeService;
     private Location mLastLocation;
-    private LocationRequest mLocationRequest;
     private String mCity;
     private Context mApplicationContext;
     private Movie mSelectedMovie;
@@ -298,8 +294,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             Geocoder geocoder = new Geocoder(mApplicationContext, Locale.getDefault());
             List<Address> addresses = null;
             try {
-                addresses = geocoder.getFromLocation(new Double(lat), new Double(lon), 1);
-                addresses = geocoder.getFromLocation(new Double(lat), new Double(lon), 1);
+                addresses = geocoder.getFromLocation(Double.valueOf(lat), Double.valueOf(lon), 1);
                 if (addresses.size() > 0) {
                     String address = addresses.get(0).getLocality();
                     if (addresses.get(0).getAdminArea() != null){
@@ -401,7 +396,9 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                 mRefreshLayout.setRefreshing(false);
             } else {
                 mRefreshLayout.setRefreshing(false);
-                Toast.makeText(mApplicationContext, getString(R.string.no_movies_found), Toast.LENGTH_LONG).show();
+                if (isAdded()) {
+                    Toast.makeText(mApplicationContext, getString(R.string.no_movies_found), Toast.LENGTH_LONG).show();
+                }
             }
         }
     }

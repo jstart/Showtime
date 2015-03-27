@@ -468,7 +468,9 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                 if (mProgressBar.getParent() != null && mProgressBar != null) {
                     ((LinearLayout) mProgressBar.getParent()).removeView(mProgressBar);
                 }
-                Toast.makeText(mApplicationContext, getString(R.string.movie_details_error), Toast.LENGTH_LONG).show();
+                if (isAdded()){
+                    Toast.makeText(mApplicationContext, getString(R.string.movie_details_error), Toast.LENGTH_LONG).show();
+                }
             }
         }
     }

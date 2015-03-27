@@ -18,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.truman.showtime.showtime.R;
@@ -143,19 +144,23 @@ public class MainActivity extends ActionBarActivity {
 
     protected void onResume() {
         super.onResume();
-        SmartLocation.with(this).location().oneFix()
-                .provider(new LocationGooglePlayServicesWithFallbackProvider(this))
-                .start(new OnLocationUpdatedListener() {
-                    @Override
-                    public void onLocationUpdated(Location location) {
-                        if (mLastLocation == null || (mLastLocation.getLatitude() != location.getLatitude()
-                                && mLastLocation.getLongitude() != location.getLongitude())) {
-                            mLastLocation = location;
-                            theaterListFragment.refreshWithLocation(location);
-                            movieListFragment.refreshWithLocation(location);
+        try {
+            SmartLocation.with(this).location().oneFix()
+                    .provider(new LocationGooglePlayServicesWithFallbackProvider(this))
+                    .start(new OnLocationUpdatedListener() {
+                        @Override
+                        public void onLocationUpdated(Location location) {
+                            if (mLastLocation == null || (mLastLocation.getLatitude() != location.getLatitude()
+                                    && mLastLocation.getLongitude() != location.getLongitude())) {
+                                mLastLocation = location;
+                                theaterListFragment.refreshWithLocation(location);
+                                movieListFragment.refreshWithLocation(location);
+                            }
                         }
-                    }
-                });
+                    });
+        } catch (Exception e){
+            Toast.makeText(getApplicationContext(), getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
+        }
     }
 
     public class ShowtimePagerAdapter extends FragmentStatePagerAdapter {
