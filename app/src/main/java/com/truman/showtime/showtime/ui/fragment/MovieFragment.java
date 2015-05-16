@@ -1,6 +1,7 @@
 package com.truman.showtime.showtime.ui.fragment;
 
 import android.app.Fragment;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
@@ -168,7 +169,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
 
         mHeroImage = (ImageView)  mTheaterAdapter.mHeaderView.findViewById(R.id.imageView);
         ImageButton playButton = (ImageButton)  mTheaterAdapter.mHeaderView.findViewById(R.id.play_button);
-        if (!mMovie.trailer.equals("false")) {
+        if (!mMovie.trailer.equals("false") || mMovie.trailer == null) {
             View.OnClickListener clickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -178,7 +179,11 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
                     } else {
                         Intent i = new Intent(Intent.ACTION_VIEW);
                         i.setData(Uri.parse(mMovie.trailer));
-                        startActivity(i);
+                        try {
+                            startActivity(i);
+                        } catch (ActivityNotFoundException e){
+
+                        }
                     }
                 }
             };
@@ -189,7 +194,6 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         }
 
         if (mMovie.poster != null) {
-            Picasso.with(mApplicationContext).setLoggingEnabled(true);
             Picasso.with(mApplicationContext).load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
         }else {
             mHeroImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));

@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="@style/Theme.AppCompat.Light">
+    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <item name="colorControlHighlight">@color/primary</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
@@ -16,8 +16,8 @@
         <item name="android:windowActionBarOverlay">true</item>
         <item name="windowActionBarOverlay">true</item>
 
-        <item name="windowActionBar">false</item>
-        <item name="android:windowActionBar">false</item>
+        <!--<item name="windowActionBar">false</item>-->
+        <!--<item name="android:windowActionBar">false</item>-->
         <!--<item name="android:windowTranslucentStatus">true</item>-->
         <item name="android:fitsSystemWindows">false</item>
         <!--<item name="android:windowNoTitle">false</item>-->

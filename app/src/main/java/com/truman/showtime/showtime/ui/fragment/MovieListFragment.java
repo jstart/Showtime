@@ -226,11 +226,17 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         public void bindMovie(Movie movie) {
             mMovie = movie;
-            TextView titleTextView = (TextView) itemView.findViewById(R.id.list_item_theater_textview);
-            TextView addressTextView = (TextView) itemView.findViewById(R.id.list_item_theater_address_textview);
+            TextView titleTextView = (TextView) itemView.findViewById(R.id.movie_title_textview);
+            TextView detailsTextView = (TextView) itemView.findViewById(R.id.movie_details_textview);
+//            ImageView movieImageView = (ImageView) itemView.findViewById(R.id.image_view);
 
             titleTextView.setText(mMovie.name);
-            addressTextView.setText(mMovie.description);
+            detailsTextView.setText(mMovie.description);
+//            if (mMovie.poster != null) {
+//                Picasso.with(mApplicationContext).load(mMovie.posterURLForDensity(mApplicationContext)).into(movieImageView);
+//            }else {
+//                movieImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
+//            }
         }
 
         @Override
@@ -266,7 +272,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         @Override
         public MovieHolder onCreateViewHolder(ViewGroup parent, int pos) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.list_item_layout, parent, false);
+                    .inflate(R.layout.movie_list_item_layout, parent, false);
             return new MovieHolder(view);
         }
 

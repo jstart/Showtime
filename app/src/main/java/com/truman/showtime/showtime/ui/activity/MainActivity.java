@@ -134,6 +134,7 @@ public class MainActivity extends ActionBarActivity {
 
     protected void onDestroy() {
         mMixpanel.flush();
+        SmartLocation.with(this).location().stop();
         super.onDestroy();
     }
 
@@ -158,7 +159,7 @@ public class MainActivity extends ActionBarActivity {
                             }
                         }
                     });
-        } catch (Exception e){
+        } catch (IllegalArgumentException e){
             Toast.makeText(getApplicationContext(), getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
         }
     }

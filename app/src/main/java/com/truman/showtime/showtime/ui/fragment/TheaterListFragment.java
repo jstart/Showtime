@@ -141,33 +141,37 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     }
 
     public void refreshWithLocation(Location location) {
-        mLastLocation = location;
-        mRefreshLayout.post(new Runnable() {
-            @Override public void run() {
-                mRefreshLayout.setRefreshing(true);
-            }
-        });
+        try {
+            mLastLocation = location;
+            mRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mRefreshLayout.setRefreshing(true);
+                }
+            });
 
-        if (Build.MODEL.contains("google_sdk") ||
+            if (Build.MODEL.contains("google_sdk") ||
                     Build.MODEL.contains("Emulator") ||
                     Build.MODEL.contains("Android SDK")) {
-            ShowtimeAPITask api = new ShowtimeAPITask();
-            api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
-        }else if (location != null) {
-            fetchTimesForDate("0");
-        } else {
-            if (location != null) {
+                ShowtimeAPITask api = new ShowtimeAPITask();
+                api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
+            } else if (location != null) {
                 fetchTimesForDate("0");
+            } else {
+                if (location != null) {
+                    fetchTimesForDate("0");
+                } else {
+                    mRefreshLayout.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mRefreshLayout.setRefreshing(false);
+                        }
+                    });
+                    Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
+                }
             }
-            else {
-                mRefreshLayout.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mRefreshLayout.setRefreshing(false);
-                    }
-                });
-                Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
-            }
+        } catch (NullPointerException e){
+
         }
     }
 
