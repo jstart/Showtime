@@ -42,9 +42,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
-import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
-import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.truman.showtime.showtime.R;
 import com.truman.showtime.showtime.models.Theater;
 import com.truman.showtime.showtime.service.ShowtimeService;
@@ -64,12 +61,12 @@ import java.util.List;
 
 import static com.truman.showtime.showtime.service.ShowtimeService.Showtimes;
 
-public class TheaterListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, ObservableScrollViewCallbacks {
+public class TheaterListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private TheaterAdapter mTheaterAdapter;
     private ArrayList<Theater> mTheaterResults;
 
     private SwipeRefreshLayout mRefreshLayout;
-    private ObservableRecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private Showtimes mShowtimeService;
     private Location mLastLocation;
@@ -97,8 +94,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
         mRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.primary));
         mRefreshLayout.setOnRefreshListener(this);
 
-        mRecyclerView = (ObservableRecyclerView) rootView.findViewById(R.id.listview);
-        mRecyclerView.setScrollViewCallbacks(this);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mApplicationContext));
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -215,18 +211,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     @Override
     public void onRefresh() {
         refreshWithLocation(mLastLocation);
-    }
-
-    @Override
-    public void onScrollChanged(int i, boolean b, boolean b2) {
-    }
-
-    @Override
-    public void onDownMotionEvent() {
-    }
-
-    @Override
-    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
     }
 
     private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {

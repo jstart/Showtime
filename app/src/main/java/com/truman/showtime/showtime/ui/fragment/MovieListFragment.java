@@ -41,9 +41,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
-import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
-import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.truman.showtime.showtime.R;
 import com.truman.showtime.showtime.models.Movie;
 import com.truman.showtime.showtime.service.ShowtimeService;
@@ -62,12 +59,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MovieListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, ObservableScrollViewCallbacks {
+public class MovieListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private MovieAdapter mMovieAdapter;
     private List<Movie> mMovieResults;
 
     private SwipeRefreshLayout mRefreshLayout;
-    private ObservableRecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private ShowtimeService.Showtimes mShowtimeService;
     private Location mLastLocation;
@@ -95,8 +92,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         mRefreshLayout.setOnRefreshListener(this);
         mRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.primary));
 
-        mRecyclerView = (ObservableRecyclerView) rootView.findViewById(R.id.listview);
-        mRecyclerView.setScrollViewCallbacks(this);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.listview);
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mApplicationContext));
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -125,25 +121,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
         super.onPause();
     }
 
-    @Override
-    public void onScrollChanged(int i, boolean b, boolean b2) {
-    }
-
-    @Override
-    public void onDownMotionEvent() {
-    }
-
-    @Override
-    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-//        final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
-//        actionBar.setShowHideAnimationEnabled(true);
-//        if (scrollState == ScrollState.DOWN){
-//            actionBar.show();
-//        } else if (scrollState == ScrollState.UP){
-//            actionBar.show();
-//        }
-    }
-
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) mApplicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -159,25 +136,26 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     }
 
     public void refreshWithLocation(Location location) {
-        mLastLocation = location;
-        mRefreshLayout.post(new Runnable() {
-            @Override public void run() {
-                mRefreshLayout.setRefreshing(true);
-            }
-        });
+        try {
+            mLastLocation = location;
+            mRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mRefreshLayout.setRefreshing(true);
+                }
+            });
 
-        if (mLastLocation != null) {
-            fetchTimesForDate("0");
-        } else {
-            if (Build.MODEL.contains("google_sdk") ||
-                    Build.MODEL.contains("Emulator") ||
-                    Build.MODEL.contains("Android SDK")) {
-                ShowtimeApiManager api = new ShowtimeApiManager();
-                api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
-            }else if (mLastLocation != null) {
+            if (mLastLocation != null) {
                 fetchTimesForDate("0");
-            }
-            else {
+            } else {
+                if (Build.MODEL.contains("google_sdk") ||
+                        Build.MODEL.contains("Emulator") ||
+                        Build.MODEL.contains("Android SDK")) {
+                    ShowtimeApiManager api = new ShowtimeApiManager();
+                    api.execute("33.8358", "-118.3406", "0", "Torrance,CA");
+                } else if (mLastLocation != null) {
+                    fetchTimesForDate("0");
+                } else {
                     mRefreshLayout.post(new Runnable() {
                         @Override
                         public void run() {
@@ -185,7 +163,10 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
                         }
                     });
                     Toast.makeText(mApplicationContext, getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
+                }
             }
+        } catch (NullPointerException e){
+
         }
     }
 

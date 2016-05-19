@@ -9,10 +9,10 @@
     android:paddingBottom="0dp"
     android:id="@+id/refresh_layout"
     tools:context=".MainActivity$PlaceholderFragment">
-    <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
+    <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:nestedScrollingEnabled="true"
         android:id="@+id/listview">
-        </com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView>
+        </android.support.v7.widget.RecyclerView>
 </android.support.v4.widget.SwipeRefreshLayout>

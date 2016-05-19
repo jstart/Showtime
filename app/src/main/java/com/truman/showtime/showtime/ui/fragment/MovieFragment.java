@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -36,9 +35,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
-import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
-import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.google.android.youtube.player.YouTubeIntents;
 import com.squareup.picasso.Picasso;
 import com.truman.showtime.showtime.R;
@@ -62,11 +58,11 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MovieFragment extends android.support.v4.app.Fragment implements ObservableScrollViewCallbacks, AdapterView.OnItemSelectedListener {
+public class MovieFragment extends android.support.v4.app.Fragment implements AdapterView.OnItemSelectedListener {
 
     private Movie mMovie;
     private ActionBar mToolbar;
-    private ObservableRecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private TheaterAdapter mTheaterAdapter;
     private TextView mDescriptionView;
@@ -114,7 +110,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
         titleView.setText(mMovie.name);
         TextView detailsView = (TextView) mTheaterAdapter.mHeaderView.findViewById(R.id.detailsView);
         detailsView.setText(mMovie.headerDescription());
-        mRecyclerView = (ObservableRecyclerView) rootView;
+        mRecyclerView = (RecyclerView) rootView;
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(mApplicationContext));
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -156,15 +152,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (mToolbar != null){
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mToolbar.setTitle("");
-                cd = new ColorDrawable(getResources().getColor(R.color.primary_dark));
-                mToolbar.setBackgroundDrawable(cd);
-                cd.setAlpha(0);
-                mRecyclerView.setScrollViewCallbacks(this);
-            } else {
                 mToolbar.setTitle(mMovie.name);
-            }
         }
 
         mHeroImage = (ImageView)  mTheaterAdapter.mHeaderView.findViewById(R.id.imageView);
@@ -265,35 +253,6 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ob
 
         }
         return super.onContextItemSelected(item);
-    }
-
-    @Override
-    public void onScrollChanged(int i, boolean b, boolean b2) {
-            cd.setAlpha(getAlphaForActionBar(i));
-    }
-
-    private int getAlphaForActionBar(int scrollY) {
-        int minDist = 0, maxDist = 650;
-        if (scrollY > maxDist) {
-            mToolbar.setTitle(mMovie.name);
-            return 255;
-        } else if (scrollY < minDist) {
-            return 0;
-        } else {
-            int alpha = 0;
-            alpha = (int) ((255.0 / maxDist) * scrollY);
-            mToolbar.setTitle("");
-            return alpha;
-        }
-    }
-    @Override
-    public void onDownMotionEvent() {
-
-    }
-
-    @Override
-    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-
     }
 
     @Override
