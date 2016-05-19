@@ -26,7 +26,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -52,8 +51,6 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -122,10 +119,10 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ad
         mDetailsLayout = (LinearLayout) mTheaterAdapter.mHeaderView.findViewById(R.id.detail_layout);
         mProgressBar = (ProgressBar) mTheaterAdapter.mHeaderView.findViewById(R.id.progress_bar);
 
-        mSpinner = (Spinner) mTheaterAdapter.mHeaderView.findViewById(R.id.today_spinner);
-        mSpinner.setVisibility(View.INVISIBLE);
-        List<String> list = new ArrayList<String>(Arrays.asList("Today", "Tomorrow", "Friday"));
-        ArrayAdapter adapter = new ArrayAdapter(mApplicationContext, R.layout.spinner_item, list);
+//        mSpinner = (Spinner) mTheaterAdapter.mHeaderView.findViewById(R.id.today_spinner);
+//        mSpinner.setVisibility(View.INVISIBLE);
+//        List<String> list = new ArrayList<String>(Arrays.asList("Today", "Tomorrow", "Friday"));
+//        ArrayAdapter adapter = new ArrayAdapter(mApplicationContext, R.layout.spinner_item, list);
 //        mSpinner.setAdapter(adapter);
 //        mSpinner.setOnItemSelectedListener(this);
 //        mSpinner.getBackground().setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_ATOP);

@@ -45,7 +45,7 @@
             android:layout_height="44dp"
             android:paddingTop="10dp"
             android:paddingLeft="16dp"
-            android:singleLine="true"
+            android:maxLines="1"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textStyle="bold"
             android:id="@+id/titleView" />
@@ -85,32 +85,32 @@
             android:layout_width="match_parent"
             android:layout_height="1dip"
             android:background="#dcdcdc" />
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <!--<FrameLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="10dp"
                 android:paddingLeft="16dp"
                 android:paddingBottom="10dp"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 android:textStyle="bold"
                 android:layout_gravity="left"
                 android:text="@string/showtimes_nearby_title"
                 android:id="@+id/showtimesTitleView" />
-            <Spinner
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:prompt="@string/select_day"
-                android:id="@+id/today_spinner"
-                android:text="@string/today"
-                android:paddingTop="8dp"
-                android:paddingLeft="16dp"
-                android:paddingBottom="8dp"
-                android:elevation="1dp"
-                android:layout_gravity="right|center_vertical"/>
-        </FrameLayout>
+            <!--<Spinner-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="fill_parent"-->
+                <!--android:prompt="@string/select_day"-->
+                <!--android:id="@+id/today_spinner"-->
+                <!--android:text="@string/today"-->
+                <!--android:paddingTop="8dp"-->
+                <!--android:paddingLeft="16dp"-->
+                <!--android:paddingBottom="8dp"-->
+                <!--android:elevation="1dp"-->
+                <!--android:layout_gravity="right|center_vertical"/>-->
+        <!--</FrameLayout>-->
     </LinearLayout>
 </TableLayout>
