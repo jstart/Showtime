@@ -1,35 +1,33 @@
-
-
 buildscript {
     repositories {
-        jcenter()
-        maven { url 'https://maven.fabric.io/public' }
+        google()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0-alpha1'
-        // The Fabric Gradle plugin uses an open ended version to
-        // react quickly to Android tooling updates
-        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'com.android.tools.build:gradle:8.10.1'
     }
 }
 
 repositories {
-    jcenter()
-    maven { url 'https://maven.fabric.io/public' }
+    google()
+    mavenCentral()
 }
 apply plugin: 'com.android.application'
 
-apply plugin: 'io.fabric'
-
 android {
-    compileSdkVersion 23
-    buildToolsVersion '23.0.3'
+    namespace 'com.truman.showtime.showtime'
+    compileSdk 35
+    buildToolsVersion '36.0.0'
+    buildFeatures {
+        buildConfig = true
+    }
     defaultConfig {
         applicationId 'com.truman.showtime.showtime'
-        minSdkVersion 14
-        targetSdkVersion 22
+        minSdkVersion 21
+        targetSdk 35// Consider raising minSdkVersion for Play Store
         versionCode 13
         versionName '1.0'
+        signingConfig signingConfigs.debug
     }
     signingConfigs {
         release {
@@ -46,44 +44,33 @@ android {
 //            ext.enableCrashlytics = false
         }
         release {
-            ext.enableCrashlytics = true
-            buildConfigField "boolean", "USE_CRASHLYTICS", "true"
             signingConfig signingConfigs.release
         }
     }
     packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/license.txt'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/notice.txt'
-        exclude 'META-INF/ASL2.0'
+        resources {
+            excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE', 'META-INF/LICENSE.txt', 'META-INF/license.txt', 'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'META-INF/notice.txt', 'META-INF/ASL2.0']
+        }
     }
     productFlavors {
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:recyclerview-v7:+'
-    compile 'com.android.support:cardview-v7:+'
-    compile 'com.android.support:appcompat-v7:22.+'
-    compile 'com.android.support:support-v4:+'
-    compile 'com.google.android.gms:play-services:7+'
-    compile 'com.squareup.okhttp:okhttp:2.+'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2+'
-    compile 'com.squareup.retrofit:retrofit:1.9.+'
-    compile 'com.squareup.picasso:picasso:2.+'
-    compile 'com.mixpanel.android:mixpanel-android:4.+@aar'
-    compile 'com.parse.bolts:bolts-android:1.+'
-    compile 'com.octo.android.robospice:robospice:1.+'
-    compile 'com.octo.android.robospice:robospice-retrofit:1.+'
-    compile ('io.nlopez.smartlocation:library:3.0.+') {
-        transitive = false
-    }
-    compile('com.crashlytics.sdk.android:crashlytics:2.+@aar') {
-        transitive = true
-    }
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-beta01'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'io.nlopez.smartlocation:library:3.3.3'
+    implementation 'com.squareup.picasso:picasso:2.8'
+    implementation files('libs/YouTubeAndroidPlayerApi.jar')
+    // Add other dependencies as needed
 }
+
+// TODO: Update dependencies to latest versions and migrate to AndroidX

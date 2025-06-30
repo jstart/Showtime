@@ -1,6 +1,5 @@
 package com.truman.showtime.showtime.ui.fragment;
 
-import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -10,12 +9,11 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.internal.widget.AdapterViewCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -55,7 +53,7 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MovieFragment extends android.support.v4.app.Fragment implements AdapterView.OnItemSelectedListener {
+public class MovieFragment extends androidx.fragment.app.Fragment implements AdapterView.OnItemSelectedListener {
 
     private Movie mMovie;
     private ActionBar mToolbar;
@@ -82,6 +80,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ad
     private static final int SHOWTIME = 1;
 
     private ImageView mHeroImage;
+    private int mContextMenuPosition = RecyclerView.NO_POSITION;
     public MovieFragment() {
     }
 
@@ -141,7 +140,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ad
             MovieDetailsTask movieDetailsTask = new MovieDetailsTask();
             movieDetailsTask.execute();
         }
-        mToolbar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+        mToolbar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         return rootView;
     }
 
@@ -179,7 +178,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ad
         }
 
         if (mMovie.poster != null) {
-            Picasso.with(mApplicationContext).load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
+            Picasso.get().load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
         }else {
             mHeroImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
         }
@@ -221,33 +220,19 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ad
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterViewCompat.AdapterContextMenuInfo info = (AdapterViewCompat.AdapterContextMenuInfo) item.getMenuInfo();
-        // Handle context actions
-        if (item.getTitle().equals(getString(R.string.directions_theater))){
-            // Create a Uri from an intent string. Use the result to create an Intent.
+        if (item.getTitle().equals(getString(R.string.directions_theater)) && mContextMenuPosition != RecyclerView.NO_POSITION) {
+            Theater selectedTheater = mMovie.theaters.get(mContextMenuPosition);
             String theaterString = null;
             try {
-                theaterString = URLEncoder.encode(mSelectedTheater.address, "UTF-8");
+                theaterString = URLEncoder.encode(selectedTheater.address, "UTF-8");
                 Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + theaterString);
-                // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                // Make the Intent explicit by setting the Google Maps package
-//                mapIntent.setPackage("com.google.android.apps.maps");
-                // Attempt to start an activity that can handle the Intent
                 if (mapIntent.resolveActivity(mApplicationContext.getPackageManager()) != null) {
                     startActivity(mapIntent);
                 }
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-        } else if (item.getTitle().equals(getString(R.string.share_showtimes))){
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, mMovie.name + "\n" + mSelectedTheater.name + "\n" + mSelectedTheater.address + "\n" + mSelectedTheater.showtimesString() + "\nhttp://google.com/movies?near=" + mCity + "&mid=" + mMovie.id);
-            sendIntent.setType("text/plain");
-            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_showtimes)));
-        } else if (item.getTitle().equals(getString(R.string.buy_tickets))){
-
         }
         return super.onContextItemSelected(item);
     }
@@ -262,16 +247,12 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ad
 
     }
 
-    private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    private class TheaterHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
         private Theater mTheater;
 
-        public TheaterHolder(View itemView, int pos) {
+        public TheaterHolder(View itemView) {
             super(itemView);
-            if (pos != HEADER) {
-                itemView.setOnClickListener(this);
-                itemView.setOnLongClickListener(this);
-                registerForContextMenu(itemView);
-            }
+            itemView.setOnLongClickListener(this);
         }
 
         public void bindTheater(Theater theater) {
@@ -284,15 +265,9 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ad
         }
 
         @Override
-        public void onClick(View v) {
-            mSelectedTheater = mTheater;
-            getActivity().openContextMenu(v);
-        }
-
-        @Override
         public boolean onLongClick(View v) {
-            mSelectedTheater = mTheater;
-            getActivity().openContextMenu(v);
+            mContextMenuPosition = getAdapterPosition();
+            v.showContextMenu();
             return true;
         }
     }
@@ -304,12 +279,12 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ad
         @Override
         public TheaterHolder onCreateViewHolder(ViewGroup parent, int pos) {
             if (pos == HEADER) {
-                return new TheaterHolder(mHeaderView, pos);
+                return new TheaterHolder(mHeaderView);
             }
             else {
                 View view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.list_item_layout, parent, false);
-                return new TheaterHolder(view, pos);
+                return new TheaterHolder(view);
             }
         }
 
@@ -418,7 +393,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Ad
                     mShowtimesTitleView.setAlpha(1);
                     mSeparatorView.setAlpha(1);
                     if (mMovie.poster != null) {
-                        Picasso.with(mApplicationContext).load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
+                        Picasso.get().load(mMovie.posterURLForDensity(mApplicationContext)).into(mHeroImage);
                     }
                 } else {
                     if (mProgressBar.getParent() != null && mProgressBar != null) {

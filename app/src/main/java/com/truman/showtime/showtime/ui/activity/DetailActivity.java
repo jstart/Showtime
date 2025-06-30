@@ -1,14 +1,14 @@
 package com.truman.showtime.showtime.ui.activity;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.truman.showtime.showtime.ui.fragment.MovieFragment;
 import com.truman.showtime.showtime.ui.fragment.MoviesForTheaterFragment;
 import com.truman.showtime.showtime.R;
 
-public class DetailActivity extends ActionBarActivity {
+public class DetailActivity extends AppCompatActivity {
     String mLat;
     String mLon;
     String mCity;

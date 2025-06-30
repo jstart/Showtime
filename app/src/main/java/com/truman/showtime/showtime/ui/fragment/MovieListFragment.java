@@ -25,11 +25,10 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.internal.widget.AdapterViewCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -59,7 +58,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MovieListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class MovieListFragment extends androidx.fragment.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private MovieAdapter mMovieAdapter;
     private List<Movie> mMovieResults;
 
@@ -71,6 +70,7 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
     private String mCity;
     private Context mApplicationContext;
     private Movie mSelectedMovie;
+    private int mContextMenuPosition = RecyclerView.NO_POSITION;
 
     public MovieListFragment() {
     }
@@ -179,11 +179,11 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if (item.getTitle().equals(getString(R.string.share_movie))) {
-            AdapterViewCompat.AdapterContextMenuInfo info = (AdapterViewCompat.AdapterContextMenuInfo) item.getMenuInfo();
+        if (item.getTitle().equals(getString(R.string.share_movie)) && mContextMenuPosition != RecyclerView.NO_POSITION) {
+            Movie selectedMovie = mMovieResults.get(mContextMenuPosition);
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, mSelectedMovie.name + "\n" + "http://google.com/movies?near=" + mCity + "&mid=" + mSelectedMovie.id);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, selectedMovie.name + "\n" + "http://google.com/movies?near=" + mCity + "&mid=" + selectedMovie.id);
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_movie)));
         }
@@ -202,7 +202,6 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
             super(itemView);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
-            registerForContextMenu(itemView);
         }
 
         public void bindMovie(Movie movie) {
@@ -242,8 +241,8 @@ public class MovieListFragment extends android.support.v4.app.Fragment implement
 
         @Override
         public boolean onLongClick(View v) {
-            mSelectedMovie = mMovie;
-            getActivity().openContextMenu(v);
+            mContextMenuPosition = getAdapterPosition();
+            v.showContextMenu();
             return true;
         }
     }

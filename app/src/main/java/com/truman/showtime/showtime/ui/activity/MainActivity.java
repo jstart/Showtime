@@ -7,20 +7,19 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.core.view.MenuItemCompat;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.truman.showtime.showtime.R;
 import com.truman.showtime.showtime.ui.fragment.MovieListFragment;
 import com.truman.showtime.showtime.ui.fragment.TheaterListFragment;
@@ -33,11 +32,10 @@ import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
 import io.nlopez.smartlocation.location.providers.LocationGooglePlayServicesWithFallbackProvider;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
     private ShowtimePagerAdapter mDemoCollectionPagerAdapter;
     private ViewPager mViewPager;
     private SlidingTabLayout mSlidingTabLayout;
-    private MixpanelAPI mMixpanel;
     private TheaterListFragment theaterListFragment;
     private MovieListFragment movieListFragment;
     private SearchView mSearchView;
@@ -47,8 +45,6 @@ public class MainActivity extends ActionBarActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mMixpanel =
-                MixpanelAPI.getInstance(this, MIXPANEL_TOKEN);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
@@ -71,7 +67,6 @@ public class MainActivity extends ActionBarActivity {
 
             @Override
             public void onPageSelected(int position) {
-                mMixpanel.track(String.valueOf(mDemoCollectionPagerAdapter.getPageTitle(position)), null);
                 mViewPager.setCurrentItem(position, true);
             }
 
@@ -133,7 +128,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     protected void onDestroy() {
-        mMixpanel.flush();
         SmartLocation.with(this).location().stop();
         super.onDestroy();
     }
@@ -147,18 +141,17 @@ public class MainActivity extends ActionBarActivity {
         super.onResume();
         try {
             SmartLocation.with(this).location().oneFix()
-                    .provider(new LocationGooglePlayServicesWithFallbackProvider(this))
-                    .start(new OnLocationUpdatedListener() {
-                        @Override
-                        public void onLocationUpdated(Location location) {
-                            if (mLastLocation == null || (mLastLocation.getLatitude() != location.getLatitude()
-                                    && mLastLocation.getLongitude() != location.getLongitude())) {
-                                mLastLocation = location;
-                                theaterListFragment.refreshWithLocation(location);
-                                movieListFragment.refreshWithLocation(location);
-                            }
+                .start(new OnLocationUpdatedListener() {
+                    @Override
+                    public void onLocationUpdated(Location location) {
+                        if (mLastLocation == null || (mLastLocation.getLatitude() != location.getLatitude()
+                                && mLastLocation.getLongitude() != location.getLongitude())) {
+                            mLastLocation = location;
+                            theaterListFragment.refreshWithLocation(location);
+                            movieListFragment.refreshWithLocation(location);
                         }
-                    });
+                    }
+                });
         } catch (IllegalArgumentException e){
             Toast.makeText(getApplicationContext(), getString(R.string.location_services_disabled), Toast.LENGTH_LONG).show();
         }

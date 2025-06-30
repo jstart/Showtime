@@ -26,11 +26,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.internal.widget.AdapterViewCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -61,7 +60,7 @@ import java.util.List;
 
 import static com.truman.showtime.showtime.service.ShowtimeService.Showtimes;
 
-public class TheaterListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class TheaterListFragment extends androidx.fragment.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private TheaterAdapter mTheaterAdapter;
     private ArrayList<Theater> mTheaterResults;
 
@@ -73,6 +72,7 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
     private String mCity;
     private Theater mSelectedTheater;
     private Context mApplicationContext;
+    private int mContextMenuPosition = RecyclerView.NO_POSITION;
 
     public TheaterListFragment() {
     }
@@ -180,28 +180,24 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterViewCompat.AdapterContextMenuInfo info = (AdapterViewCompat.AdapterContextMenuInfo) item.getMenuInfo();
-        if (item.getTitle().equals(getString(R.string.directions_theater))){
+        if (item.getTitle().equals(getString(R.string.directions_theater)) && mContextMenuPosition != RecyclerView.NO_POSITION) {
+            Theater selectedTheater = mTheaterResults.get(mContextMenuPosition);
             String theaterString = null;
             try {
-                theaterString = URLEncoder.encode(mSelectedTheater.address, "UTF-8");
+                theaterString = URLEncoder.encode(selectedTheater.address, "UTF-8");
                 Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + theaterString);
-                // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                // Make the Intent explicit by setting the Google Maps package
-//                mapIntent.setPackage("com.google.android.apps.maps");
-                // Attempt to start an activity that can handle the Intent
                 if (mapIntent.resolveActivity(mApplicationContext.getPackageManager()) != null) {
                     startActivity(mapIntent);
                 }
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-        } else if (item.getTitle().equals(getString(R.string.share_theater))){
+        } else if (item.getTitle().equals(getString(R.string.share_theater)) && mContextMenuPosition != RecyclerView.NO_POSITION) {
+            Theater selectedTheater = mTheaterResults.get(mContextMenuPosition);
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, mSelectedTheater.name + "\n" + mSelectedTheater.address + "\n" + "http://google.com/movies?near=" + mCity + "&tid=" + mSelectedTheater.id);
-
+            sendIntent.putExtra(Intent.EXTRA_TEXT, selectedTheater.name + "\n" + selectedTheater.address);
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.share_theater)));
         }
@@ -220,7 +216,6 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
             super(itemView);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
-            registerForContextMenu(itemView);
         }
 
         public void bindTheater(Theater theater) {
@@ -255,8 +250,8 @@ public class TheaterListFragment extends android.support.v4.app.Fragment impleme
 
         @Override
         public boolean onLongClick(View v) {
-            mSelectedTheater = mTheater;
-            getActivity().openContextMenu(v);
+            mContextMenuPosition = getAdapterPosition();
+            v.showContextMenu();
             return true;
         }
     }

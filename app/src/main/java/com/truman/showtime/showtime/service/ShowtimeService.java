@@ -6,12 +6,14 @@ import com.truman.showtime.showtime.models.Theater;
 
 import java.util.ArrayList;
 
-import retrofit.RestAdapter;
-import retrofit.http.GET;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public class ShowtimeService {
+    // TODO: Consider moving API_URL to a configuration file or BuildConfig for flexibility.
     private static final String API_URL = "http://showtime.ctruman.info:5000";
     private static final String OMDB_API_URL = "http://www.omdbapi.com";
 
@@ -51,22 +53,18 @@ public class ShowtimeService {
     }
 
     public static Showtimes adapter() {
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(API_URL)
-                .setLogLevel(RestAdapter.LogLevel.NONE)
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(API_URL)
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
-        Showtimes showtimeAdapter = restAdapter.create(Showtimes.class);
-        return showtimeAdapter;
+        return retrofit.create(Showtimes.class);
     }
 
     public static OMDBAPI omdbAdapter() {
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(OMDB_API_URL)
-                .setLogLevel(RestAdapter.LogLevel.NONE)
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(OMDB_API_URL)
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
-        OMDBAPI omdbAdapter = restAdapter.create(OMDBAPI.class);
-        return omdbAdapter;
+        return retrofit.create(OMDBAPI.class);
     }
 }
